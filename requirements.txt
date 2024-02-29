@@ -2,5 +2,6 @@ Flask
 requests
 gunicorn
 sqlalchemy
+flask-SQLALchemy
 pymysql
 apscheduler
