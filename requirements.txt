@@ -6,3 +6,4 @@ flask-SQLALchemy
 pymysql
 apscheduler
 flask-login
+flask-migrate

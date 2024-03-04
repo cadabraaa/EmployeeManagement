@@ -12,29 +12,34 @@
       {% endwith %}
 
 <h1>Employee</h1>
-     <button class="btn btn-primary mt-4" href="">Add Employee</button> 
+     <a <button class="btn btn-primary mt-4" href="/add_employee">Add Employee</button></a>
       <div>
-      <table class="table table-striped mt-4">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Role</th>
-              <th>First Name</th>
-              <th>Middle Name</th>
-              <th>Last Name</th>
-              <th>Email</th>
-              <th>Mobile</th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for user in users %}
-          <td><a href="" class="btn btn-success">View</a></td>
-          <td><a href="" class="btn btn-primary">Edit</a></td>
-          <td><a href="" class="btn btn-danger">Delete</a></td>
-            </tr> 
-        {% endfor %}	  
-          </tbody>
-      </table>
+          <table class="table table-striped mt-4">
+              <thead>
+                  <tr>
+                      <th>ID</th>
+                      <th>Role</th>
+                      <th>Full Name</th>
+                      <th>Email</th>
+                      <th>Mobile</th>
+                      <th>Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for employee in user.employees %}
+                      <tr>
+                          <td>{{ employee.employee_id }}</td>
+                          <td>{{ employee.role.role_type }}</td>
+                          <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
+                          <td>{{ employee.email }}</td>
+                          <td>{{ employee.mobile }}</td>
+                          <td><a href="" class="btn btn-success">View</a></td>
+                          <td><a href="" class="btn btn-primary">Edit</a></td>
+                          <td><a href="" class="btn btn-danger">Delete</a></td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
       </div>
 
 {% endblock %}

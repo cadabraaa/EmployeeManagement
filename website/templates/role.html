@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+    <div class="container mt-4">
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-success" role="alert">
+                      {{message}}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+
+<h1>Roles</h1>
+      <div class="container mt-4">
+          <form method="POST" action="{{ url_for('views.role') }}">
+              <div class="form-row">
+                  <div class="col-md-4 mb-3">
+                      <input type="text" class="form-control" id="role_name" name="role_name" placeholder="Role Name" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                      <input type="text" class="form-control" id="description" name="description" placeholder="Description">
+                  </div>
+                  <div class="col-md-2 mb-3">
+                      <button type="submit" class="btn btn-primary btn-block">Add Role</button>
+                  </div>
+              </div>
+          </form>
+
+          <table class="table table-striped mt-4">
+              <thead>
+                  <tr>
+                      <th>ID</th>
+                      <th>Role</th>
+                      <th>Description</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for role in roles %}
+                      <tr>
+                          <td>{{ role.id }}</td>
+                          <td>{{ role.role }}</td>
+                          <td>{{ role.description }}</td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+{% endblock %}

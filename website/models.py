@@ -11,10 +11,27 @@ class User(db.Model, UserMixin):
     mobile = db.Column(db.Integer, nullable=False)
     password = db.Column(db.String(150))
     establishment_year = db.Column(db.String(4))
+    employees = db.relationship('Employee', backref='user', lazy=True)
+    
+    
 
-
-
-
+class Employee(db.Model):
+    employee_id = db.Column(db.String(15), primary_key=True)
+    first_name = db.Column(db.String(150))
+    middle_name = db.Column(db.String(150))
+    last_name = db.Column(db.String(150))
+    email = db.Column(db.String(150), unique=True)
+    mobile = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+  
+class Role(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    role = db.Column(db.String(50), unique=True)
+    description = db.Column(db.String(255))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    employees = db.relationship('Employee', backref='role', lazy=True)
+    
 
 
 '''
