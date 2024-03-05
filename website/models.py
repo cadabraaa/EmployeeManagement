@@ -12,8 +12,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     establishment_year = db.Column(db.String(4))
     employees = db.relationship('Employee', backref='user', lazy=True)
-    
-    
+    roles= db.relationship('Role', backref='user', lazy=True)
 
 class Employee(db.Model):
     employee_id = db.Column(db.String(15), primary_key=True)

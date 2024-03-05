@@ -29,12 +29,12 @@
                   {% for employee in user.employees %}
                       <tr>
                           <td>{{ employee.employee_id }}</td>
-                          <td>{{ employee.role.role_type }}</td>
+                          <td>{{ employee.role.role }}</td>
                           <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
                           <td>{{ employee.email }}</td>
                           <td>{{ employee.mobile }}</td>
-                          <td><a href="" class="btn btn-success">View</a></td>
-                          <td><a href="" class="btn btn-primary">Edit</a></td>
+                          <td><a href="" class="btn btn-info">View</a></td>
+                          <td><a href="" class="btn btn-warning">Edit</a></td>
                           <td><a href="" class="btn btn-danger">Delete</a></td>
                       </tr>
                   {% endfor %}
