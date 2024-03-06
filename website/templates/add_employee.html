@@ -15,44 +15,50 @@
           <h1>Add Employee</h1>
           <form method="POST" action="{{ url_for('views.add_employee') }}">
               <div class="form-group">
-                  <label for="first_name">First Name:</label>
+                  <label for="first_name">First Name: <span style="color: red;">*</span></label>
                   <input type="text" class="form-control" id="first_name" name="first_name" required pattern="[A-Za-z]{3,}" title="Please enter a valid first name (at least 3 letters)">
               </div>
 
               <div class="form-group">
-                  <label for="middle_name">Middle Name:</label>
+                  <label for="middle_name">Middle Name (Optional):</label>
                   <input type="text" class="form-control" id="middle_name" name="middle_name">
               </div>
 
               <div class="form-group">
-                  <label for="last_name">Last Name:</label>
-                  <input type="text" class="form-control" id="last_name" name="last_name" required pattern="[A-Za-z]{3,}" title="Please enter a valid last name (at least 3 letters)">
+                  <label for="last_name">Last Name: <span style="color: red;">*</span></label>
+                  <input type="text" class="form-control" id="last_name" name="last_name" required pattern="[A-Za-z]{1,}" title="Please enter a valid last name (at least 1 letter)">
               </div>
-           
-            <div class="form-group">
-                <label for="role_id">Select Role:</label>
-                <select class="form-control" id="role_id" name="role_id" required>
-                    {% for role in roles %}
-                        <option value="{{ role.id }}">{{ role.role }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-         
+
               <div class="form-group">
-                  <label for="email">Email:</label>
+                  <label for="gender">Gender: <span style="color: red;">*</span></label>
+                  <select class="form-control" id="gender" name="gender" required>
+                      <option value="" disabled selected>Select Gender</option>
+                      {% for gender in genders %}
+                          <option value="{{ gender.id }}">{{ gender.gender }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+
+              <div class="form-group">
+                  <label for="role_id">Select Role: <span style="color: red;">*</span></label>
+                  <select class="form-control" id="role_id" name="role_id" required>
+                      <option value="" disabled selected>Select Role</option>
+                      {% for role in roles %}
+                          <option value="{{ role.id }}">{{ role.role }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+
+              <div class="form-group">
+                  <label for="email">Email: <span style="color: red;">*</span></label>
                   <input type="email" class="form-control" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address">
               </div>
 
               <div class="form-group">
-                  <label for="mobile">Mobile:</label>
+                  <label for="mobile">Mobile: <span style="color: red;">*</span></label>
                   <input type="tel" class="form-control" id="mobile" name="mobile" required pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number">
               </div>
 
-            <button class="btn btn-primary mt-4" href="/employee">Save</button>
-            
+              <button type="submit" class="btn btn-primary mt-4">Save</button>
           </form>
-          </form>
-      </div>
-    </div>
-</br>
 {% endblock %}

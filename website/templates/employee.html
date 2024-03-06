@@ -12,7 +12,7 @@
       {% endwith %}
 
 <h1>Employee</h1>
-     <a <button class="btn btn-primary mt-4" href="/add_employee">Add Employee</button></a>
+      <a href="/add_employee" class="btn btn-primary mt-4">Add Employee</a>
       <div>
           <table class="table table-striped mt-4">
               <thead>
@@ -20,6 +20,7 @@
                       <th>ID</th>
                       <th>Role</th>
                       <th>Full Name</th>
+                      <th>Gender</th>
                       <th>Email</th>
                       <th>Mobile</th>
                       <th>Action</th>
@@ -27,16 +28,17 @@
               </thead>
               <tbody>
                   {% for employee in user.employees %}
-                      <tr>
-                          <td>{{ employee.employee_id }}</td>
-                          <td>{{ employee.role.role }}</td>
-                          <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
-                          <td>{{ employee.email }}</td>
-                          <td>{{ employee.mobile }}</td>
-                          <td><a href="" class="btn btn-info">View</a></td>
-                          <td><a href="" class="btn btn-warning">Edit</a></td>
-                          <td><a href="" class="btn btn-danger">Delete</a></td>
-                      </tr>
+                  <tr>
+                      <td>{{ employee.employee_id }}</td>
+                      <td>{{ employee.role.role }}</td>
+                      <td>{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</td>
+                      <td>{{ employee.gender.gender}}</td>
+                      <td>{{ employee.email }}</td>
+                      <td>{{ employee.mobile }}</td>
+                      <td><a href="" class="btn btn-info">View</a></td>
+                      <td><a href="" class="btn btn-warning">Edit</a></td>
+                      <td><a href="" class="btn btn-danger">Delete</a></td>
+                  </tr>
                   {% endfor %}
               </tbody>
           </table>

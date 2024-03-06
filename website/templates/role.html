@@ -43,11 +43,14 @@
                           <td>{{ role.role }}</td>
                           <td>{{ role.description }}</td>
                           <td>
-                              <button class="btn btn-info btn-sm" onclick="openEditModal('{{ role.id }}', '{{ role.role }}')">Edit</button>
+                            
+                              <a href="{{ url_for('views.edit_role', role_id=role.id) }}" class="btn btn-info btn-sm">Edit</a>
                           </td>
                       </tr>
                   {% endfor %}
               </tbody>
           </table>
       </div>
+
+    
 {% endblock %}
