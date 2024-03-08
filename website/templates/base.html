@@ -39,9 +39,8 @@
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav ml-auto">
           {% if user.is_authenticated %}
-          <a class="nav-item nav-link" id="home" href="/photo">Photo</a>
-          <a class="nav-item nav-link" id="home" href="/role">Roles</a>
-          <a class="nav-item nav-link" id="home" href="/employee">Employee</a>
+          <a class="nav-item nav-link" id="employee" href="/employee">Employee</a>
+          <a class="nav-item nav-link" id="role" href="/role">Roles</a>
           <a class="nav-item nav-link" id="home" href="/">Dashboard</a>
           <a class="nav-item nav-link" id="logout" href="/logout">
               <button class="btn btn-danger">Logout</button>
@@ -76,6 +75,7 @@
       {% endblock%}
     </div>
 
+    
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
       integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"

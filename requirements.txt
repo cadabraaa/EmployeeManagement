@@ -8,3 +8,5 @@ apscheduler
 flask-login
 flask-migrate
 flask-cors
+Pillow
+PIL
