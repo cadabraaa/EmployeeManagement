@@ -3,12 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
 import os
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 
 
 def create_app():
     app = Flask(__name__)
+  
 
     app.config['SECRET_KEY'] = 'secret_key'
     db_connection = os.environ['DB_CONNECTION_STRING']

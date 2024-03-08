@@ -1,0 +1,238 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} 
+{% block content%}
+    <div class="container mt-4">
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-success" role="alert">
+                      {{message}}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+      <h1>Employee Details</h1>
+    </br>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+
+            <!-- User profile -->
+              <div class="card mb-3">
+                <div class="card-header">
+                  <h4 class="card-title">Basic Information</h4>
+                </div>
+                <div class="card-body">
+                  <div class="row align-items-center">
+
+                    <!-- Profile Picture -->
+                    <div class="col-md-4 d-flex justify-content-center">
+                          <img id="selectedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" alt="example placeholder" style="width: 300px;" />
+                    </div>
+
+          <div class="d-flex justify-content-center"></div>
+
+                    <!-- Non-editable user information -->
+          <div class="col-md-8">
+            <div class="user-info" style="font-size: larger;">
+            <p><strong>Employee ID :</strong> {{ employee.employee_id }}</p>
+            <p><strong>Full Name :</strong> {{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</p>
+            <p><strong>Role :</strong> {{ employee.role.role }}</p>
+            <p><strong>Gender :</strong> {{ employee.gender.gender}}e</p>
+            <p><strong>Email :</strong> {{ employee.email }}</p>
+            <p><strong>Mobile :</strong> {{ employee.mobile }}</p>
+            </div>
+          </div>
+
+                  </div>
+                </div>
+              </div>
+
+            <!-- User info -->
+            <div class="card mb-3">
+              <div class="card-header">
+                <h4 class="card-title">More information</h4>
+              </div>
+                <table class="table profile__table">
+                  <tbody>
+                    <tr>
+                      <th><strong>Birthdate</strong></th>
+                      <td>2/2/1980</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Height</strong></th>
+                      <td>6'0" (6feet 0inches))</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Weight</strong></th>
+                      <td>78kg (Pounds)</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Marital Status</strong></th>
+                      <td>Married</td>
+                    </tr>
+                  </tbody>
+                </table>
+             </div>
+            <!-- Education -->
+            <div class="card mb-3">
+              <div class="card-header">
+                <h4 class="card-title">Identificaion Numbers</h4>
+              </div>
+                <table class="table profile__table">
+                  <tbody>
+                    <tr>
+                      <th><strong>Aadhar Number</strong></th>
+                      <td>6310-9090-9090-9090</td>
+                    </tr>
+                    <tr>
+                      <th><strong>PAN</strong></th>
+                      <td>ABCDE12345F</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Driving License</strong></th>
+                      <td>6310-9090-9090-9090</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Voter ID</strong></th>
+                      <td>6310-9090-9090-9090</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Passport Number</strong></th>
+                      <td>6310-9090-9090-9090</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+            <!-- Family -->
+            <div class="card mb-3">
+            <div class="card-header">
+              <h4 class="card-title">Family</h4>
+              </div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Relation</th>
+                    <th scope="col">Age (Years)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Ravi Kumar</td>
+                    <td>Father</td>
+                    <td>60</td>
+                  </tr>
+                  <tr>
+                    <td>Namita Kumari</td>
+                    <td>Mother</td>
+                    <td>55</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Address -->
+            <div class="card mb-3">
+              <div class="card-header">
+                <h4 class="card-title">Address</h4>
+                <div class="row">
+                  <div class="col-md-6">
+                    <ul class="list-group">
+                      <li class="list-group-item list-group-item-dark">
+                        <strong>Current Address</strong>
+                      </li>
+                      <li class="list-group-item">123 Main Street</li>
+                      <li class="list-group-item">City</li>
+                      <li class="list-group-item">State</li>
+                      <li class="list-group-item">Country</li>
+                    </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <ul class="list-group">
+                      <li class="list-group-item list-group-item-dark">
+                        <strong>Permanent Address</strong>
+                      </li>
+                      <li class="list-group-item">456 Oak Avenue</li>
+                      <li class="list-group-item">Town</li>
+                      <li class="list-group-item">Province</li>
+                      <li class="list-group-item">Country</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Education -->
+            <div class="card mb-3">
+              <div class="card-header">
+                <h4 class="card-title">Education</h4>
+              </div>
+                <table class="table profile__table">
+                  <tbody>
+                    <tr>
+                      <th><strong>Birthdate</strong></th>
+                      <td>2/2/1980</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Height</strong></th>
+                      <td>6'0" (6feet 0inches))</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Weight</strong></th>
+                      <td>78kg (Pounds)</td>
+                    </tr>
+                    <tr>
+                      <th><strong>Marital Status</strong></th>
+                      <td>Married</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+            <!-- Experience -->
+            <div class="card mb-3">
+              <div class="card-header">
+                <h4 class="card-title">Experience</h4>
+              </div>
+                <section class="py-5">
+                  <ul class="timeline">
+                    <li class="timeline-item mb-5">
+                      <h5 class="fw-bold">Our company starts its operations</h5>
+                      <p class="text-muted mb-2 fw-bold">11 March 2020</p>
+                      <p class="text-muted">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit
+                        necessitatibus adipisci, ad alias, voluptate pariatur officia
+                        repellendus repellat inventore fugit perferendis totam dolor
+                        voluptas et corrupti distinctio maxime corporis optio?
+                      </p>
+                    </li>
+                    <li class="timeline-item mb-5">
+                      <h5 class="fw-bold">Our team exceeds 10 people</h5>
+                      <p class="text-muted mb-2 fw-bold">24 June 2020</p>
+                      <p class="text-muted">
+                        Orci varius natoque penatibus et magnis dis parturient montes,
+                        nascetur ridiculus mus. Nulla ullamcorper arcu lacus, maximus
+                        facilisis erat pellentesque nec. Duis et dui maximus dui aliquam
+                        convallis. Quisque consectetur purus erat, et ullamcorper sapien
+                        tincidunt vitae.
+                      </p>
+                    </li>
+
+                    <li class="timeline-item mb-5">
+                      <h5 class="fw-bold">Earned the first million $!</h5>
+                      <p class="text-muted mb-2 fw-bold">15 October 2020</p>
+                      <p class="text-muted">
+                        Nulla ac tellus convallis, pulvinar nulla ac, fermentum diam. Sed
+                        et urna sit amet massa dapibus tristique non finibus ligula. Nam
+                        pharetra libero nibh, id feugiat tortor rhoncus vitae. Ut suscipit
+                        vulputate mattis.
+                      </p>
+                    </li>
+                  </ul>
+                </section>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+{% endblock%}

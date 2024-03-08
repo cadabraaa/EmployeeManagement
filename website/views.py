@@ -3,6 +3,12 @@ from flask_login import login_required, current_user
 from .models import Employee, Role, Gender
 from flask_cors import CORS, cross_origin
 from . import db
+import os
+from PIL import Image
+from werkzeug.utils import secure_filename
+from . import create_app
+import time
+
 
 views = Blueprint('views', __name__)
 CORS(views)
@@ -25,7 +31,19 @@ def dashboard():
 def employee():
   return render_template("employee.html", user=current_user)
 
+######## VIEW Details ########
 
+@views.route('/employee_details/<employee_id>', methods=['GET'])
+@login_required
+def employee_details(employee_id):
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    if employee:
+        return render_template("employee_details.html", employee=employee,user=current_user)
+    else:
+        flash('Employee not found.', category='error')
+        return redirect(url_for('views.employee_list')) 
+
+  
 ######## ADD EMPLOYEE ########
 
 def generate_employee_id(company_code):
@@ -37,7 +55,7 @@ def generate_employee_id(company_code):
     new_id_number = last_id_number + 1
   else:
     new_id_number = 1
-  
+
   return f'{company_code}{new_id_number:06d}'
 
 @views.route('/add_employee', methods=['GET', 'POST'])
@@ -92,57 +110,12 @@ def add_employee():
 
     return render_template("add_employee.html", user=current_user, roles=roles, genders=genders)
 
-'''
-@views.route('/add_employee', methods=['GET', 'POST'])
-@login_required
-@cross_origin()
-def add_employee():
-    if request.method == 'POST':
-        company_code = current_user.company_code
-        first_name = request.form.get('first_name')
-        middle_name = request.form.get('middle_name')
-        last_name = request.form.get('last_name')
-        gender = request.form.get('gender')
-        email = request.form.get('email')
-        mobile = request.form.get('mobile')
-        role_id = request.form.get('role_id')
-
-        if not first_name or not last_name or not email or not mobile:
-            flash('All fields are required.', category='error')
-        else:
-            existing_employee = Employee.query.filter_by(email=email).first()
-            if existing_employee:
-                flash('Email already exists. Please use a different email address.', category='error')
-            else:
-                employee_id = generate_employee_id(company_code)
-                print(f"Generated employee_id: {employee_id}")
-                role = Role.query.get(role_id)
-                new_employee = Employee(
-                    employee_id=employee_id,
-                    first_name=first_name,
-                    middle_name=middle_name,
-                    last_name=last_name,
-                    gender=gender,
-                    email=email,
-                    mobile=mobile,
-                    user_id=current_user.id,
-                    role=role
-                )
-
-                db.session.add(new_employee)
-                db.session.commit()
-                flash('Employee added successfully!', category='success')
-
-    roles = Role.query.filter_by(user_id=current_user.id).all()
-    print(roles)
-    return render_template("add_employee.html", user=current_user, roles=roles, gender=genders)
-'''
-
 
 ######## ADD ROLES ########
 
 @views.route('/role', methods=['GET', 'POST'])
 @login_required
+@cross_origin()
 def role():
     if request.method == 'POST':
         role_name = request.form.get('role_name')
@@ -169,6 +142,7 @@ def role():
 
 @views.route('/edit_role/<int:role_id>', methods=['GET', 'POST'])
 @login_required
+@cross_origin()
 def edit_role(role_id):
     role = Role.query.get_or_404(role_id)
 
