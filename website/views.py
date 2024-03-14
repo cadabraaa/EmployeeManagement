@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .models import Employee, Role, Gender
+from .models import Employee, Role, Gender, Education, Marital, Family, Country, State, City
 from flask_cors import CORS, cross_origin
 from . import db
 import os
@@ -12,6 +12,11 @@ import time
 
 views = Blueprint('views', __name__)
 CORS(views)
+
+@views.route('/display')
+@login_required
+def display():
+  return render_template("display.html",user=current_user)
 
 ######## DASHBOARD ########
 
@@ -58,6 +63,7 @@ def generate_employee_id(company_code):
 
   return f'{company_code}{new_id_number:06d}'
 
+
 @views.route('/add_employee', methods=['GET', 'POST'])
 @login_required
 @cross_origin()
@@ -67,10 +73,18 @@ def add_employee():
         first_name = request.form.get('first_name')
         middle_name = request.form.get('middle_name')
         last_name = request.form.get('last_name')
-        gender_id = request.form.get('gender')  # Change to gender_id to match the column name
+        gender_id = request.form.get('gender')
         email = request.form.get('email')
         mobile = request.form.get('mobile')
         role_id = request.form.get('role_id')
+        birthdate = request.form.get('birthdate')
+        height = request.form.get('height')
+        weight = request.form.get('weight')
+        education_id = request.form.get('education_id')
+        marital_id = request.form.get('marital_id')
+        family_names = request.form.getlist('familyName[]')
+        family_birthdates = request.form.getlist('familyBirthdate[]')
+        family_relations = request.form.getlist('familyRelation[]')
 
         if not first_name or not last_name or not email or not mobile:
             flash('All fields are required.', category='error')
@@ -83,6 +97,8 @@ def add_employee():
                     employee_id = generate_employee_id(company_code)
                     role = Role.query.get(role_id)
                     gender = Gender.query.get(gender_id)
+                    education = Education.query.get(education_id)
+                    marital = Marital.query.get(marital_id)
 
                     # Create a new Employee instance and add it to the database
                     new_employee = Employee(
@@ -94,21 +110,42 @@ def add_employee():
                         email=email,
                         mobile=mobile,
                         user_id=current_user.id,
-                        role=role
+                        role=role,
+                        birthdate=birthdate,
+                        height=height,
+                        weight=weight,
+                        education_id=education_id,
+                        marital_id=marital_id
                     )
 
                     db.session.add(new_employee)
                     db.session.commit()
                     flash('Employee added successfully!', category='success')
+
+                    # Add family members
+                    for name, bdate, relation in zip(family_names, family_birthdates, family_relations):
+                        new_family_member = Family(
+                            employee_id=new_employee.employee_id,
+                            fullname=name,
+                            birthdate=bdate,
+                            relation=relation
+                        )
+                        db.session.add(new_family_member)
+
+                    db.session.commit()
+                    flash('Employee and family details added successfully!', category='success')
             except Exception as e:
                 db.session.rollback()
                 flash(f'An error occurred: {str(e)}', category='error')
 
     # Query roles associated with the current user
     roles = Role.query.filter_by(user_id=current_user.id).all()
-    genders = Gender.query.all()  # Query all genders
+    genders = Gender.query.all()
+    educations = Education.query.all()
+    maritals = Marital.query.all()
 
-    return render_template("add_employee.html", user=current_user, roles=roles, genders=genders)
+    return render_template("add_employee.html", user=current_user, roles=roles, genders=genders, educations=educations, maritals=maritals)
+
 
 
 ######## ADD ROLES ########
@@ -165,4 +202,45 @@ def edit_role(role_id):
                 return redirect(url_for('views.role'))
 
     return render_template("edit_role.html", user=current_user, role=role)
+  
 
+@views.route('/add_location', methods=['GET', 'POST'])
+def add_location():
+    if request.method == 'POST':
+        location_type = request.form.get('location_type')
+        name = request.form.get('name')
+        parent_id = request.form.get('parent_id')
+
+        if not name:
+            flash('Name is required.', category='error')
+        else:
+            try:
+                if location_type == 'country':
+                    new_location = Country(country=name)
+                elif location_type == 'state':
+                    new_location = State(state=name, country_id=parent_id)
+                elif location_type == 'city':
+                    new_location = City(city=name, state_id=parent_id)
+
+                db.session.add(new_location)
+                db.session.commit()
+                flash('Location added successfully!', category='success')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'An error occurred: {str(e)}', category='error')
+     
+    countries = Country.query.all()
+    states = State.query.all()
+    cities = City.query.all()
+
+    return render_template("add_location.html", countries=countries, states=states, cities=cities, user=current_user)
+
+
+
+# Route for displaying employee data
+@views.route('/display_employee', methods=['GET'])
+def display_employee():
+    # Retrieve employee data from the database
+    employees = Employee.query.all()
+
+    return render_template('display_employee.html', employees=employees)

@@ -10,79 +10,177 @@
               {% endfor %}
           {% endif %}
       {% endwith %}
-
+      
+      
       <div class="container mt-4">
           <h1>Add Employee</h1>
-        <!--Profile Photo-->
         <div class="container">
-           
-              <div class="mb-4 d-flex justify-content-center">
-                  <img id="selectedImage" src="{{ url_for('static', filename='placeholder.jpg') }}"
-                       alt="placeholder image" style="width: 300px;" />
-              </div>
+
+        <form method="POST" action="{{ url_for('views.add_employee') }}">
+            <div class="form-group">
+                <label for="first_name">First Name: <span style="color: red;">*</span></label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required pattern="[A-Za-z]{3,}" title="Please enter a valid first name (at least 3 letters)">
+            </div>
+
+            <div class="form-group">
+                <label for="middle_name">Middle Name (Optional):</label>
+                <input type="text" class="form-control" id="middle_name" name="middle_name">
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name: <span style="color: red;">*</span></label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required pattern="[A-Za-z]{1,}" title="Please enter a valid last name (at least 1 letter)">
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender: <span style="color: red;">*</span></label>
+                <select class="form-control" id="gender" name="gender" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    {% for gender in genders %}
+                        <option value="{{ gender.id }}">{{ gender.gender }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="role_id">Select Role: <span style="color: red;">*</span></label>
+                <select class="form-control" id="role_id" name="role_id" required>
+                    <option value="" disabled selected>Select Role</option>
+                    {% for role in roles %}
+                        <option value="{{ role.id }}">{{ role.role }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email: <span style="color: red;">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address">
+            </div>
+
+            <div class="form-group">
+                <label for="mobile">Mobile: <span style="color: red;">*</span></label>
+                <input type="tel" class="form-control" id="mobile" name="mobile" required pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number">
+            </div>
           
-          <div class="d-flex justify-content-center">
-              <form action="/upload" method="post" enctype="multipart/form-data">
-                  <div class="input-group">
-                      <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="customFile1" name="file" onchange="displaySelectedImage(event, 'selectedImage')">
-                          <label class="custom-file-label" for="customFile1">Choose file</label>
-                      </div>
-                      <div class="input-group-append">
-                          <button class="btn btn-primary" type="submit">Upload</button>
-                      </div>
-                  </div>
-              </form>
+          <!--Second form-->
+          <div class="form-group">
+            <label for="education">Education Qualifications:</label>
+            <select class="form-control" id="education_id" name="education_id">
+              <option value="" disabled selected>Select Your Highest Qualification</option>
+              {% for education_option in educations %}
+              <option value="{{ education_option.id }}">{{ education_option.education }}</option>
+              {% endfor %}
+            </select>
           </div>
-          
 
-          <!---Basic Information-->
-          <form method="POST" action="{{ url_for('views.add_employee') }}">
-              <div class="form-group">
-                  <label for="first_name">First Name: <span style="color: red;">*</span></label>
-                  <input type="text" class="form-control" id="first_name" name="first_name" required pattern="[A-Za-z]{3,}" title="Please enter a valid first name (at least 3 letters)">
-              </div>
+          <div class="form-group">
+            <label for="birthdate">Birthdate:</label>
+            <input type="date" id="birthdate" name="birthdate" class="form-control">
+          </div>
 
-              <div class="form-group">
-                  <label for="middle_name">Middle Name (Optional):</label>
-                  <input type="text" class="form-control" id="middle_name" name="middle_name">
-              </div>
+          <div class="form-group">
+            <label for="height">Height (cm):</label>
+            <input type="number" id="height" name="height" class="form-control">
+          </div>
 
-              <div class="form-group">
-                  <label for="last_name">Last Name: <span style="color: red;">*</span></label>
-                  <input type="text" class="form-control" id="last_name" name="last_name" required pattern="[A-Za-z]{1,}" title="Please enter a valid last name (at least 1 letter)">
-              </div>
+          <div class="form-group">
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" name="weight" class="form-control">
+          </div>
 
-              <div class="form-group">
-                  <label for="gender">Gender: <span style="color: red;">*</span></label>
-                  <select class="form-control" id="gender" name="gender" required>
-                      <option value="" disabled selected>Select Gender</option>
-                      {% for gender in genders %}
-                          <option value="{{ gender.id }}">{{ gender.gender }}</option>
-                      {% endfor %}
-                  </select>
-              </div>
+          <div class="form-group">
+            <label for="marital">Marital Status:</label>
+            <select class="form-control" id="marital_id" name="marital_id">
+              <option value="" disabled selected>Select Marital Status</option>
+              {% for marital_option in maritals %}
+              <option value="{{ marital_option.id }}">{{ marital_option.marital }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-              <div class="form-group">
-                  <label for="role_id">Select Role: <span style="color: red;">*</span></label>
-                  <select class="form-control" id="role_id" name="role_id" required>
-                      <option value="" disabled selected>Select Role</option>
-                      {% for role in roles %}
-                          <option value="{{ role.id }}">{{ role.role }}</option>
-                      {% endfor %}
-                  </select>
-              </div>
+          <div id="familyMembers">
+            <div class="familyMember">
+                <div class="form-row">
+                    <div class="col">
+                        <label for="familyName">Name:</label>
+                        <input type="text" name="familyName[]" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label for="familyBirthdate">Birthdate:</label>
+                        <input type="date" name="familyBirthdate[]" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label for="familyRelation">Relation:</label>
+                        <input type="text" name="familyRelation[]" class="form-control">
+                    </div>
+                </div>
+            </div>
+          </div>
+          <button type="button" id="addFamilyMember" class="btn btn-info mt-3">Add More Family Member</button>
+          <div>
+            
+            <button type="submit" class="btn btn-primary mt-4">Save</button>
+        </form>
+        </br>
 
-              <div class="form-group">
-                  <label for="email">Email: <span style="color: red;">*</span></label>
-                  <input type="email" class="form-control" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address">
-              </div>
+         
+           <script>
+             document.addEventListener('DOMContentLoaded', function() {
+               document.getElementById('exampleInputFile').addEventListener('change', function() {
+                 const file = this.files[0];
+                 if (file) {
+                   const reader = new FileReader();
+                   reader.onload = function(event) {
+                     document.getElementById('uploadedImage').src = event.target.result;
+                   }
+                   reader.readAsDataURL(file);
+                 }
+               });
+             });
+           </script>
+          <script>
+           
+            document.getElementById('addFamilyMember').addEventListener('click', function() {
+              var familyMembersDiv = document.getElementById('familyMembers');
+              var newMemberDiv = document.createElement('div');
+              newMemberDiv.classList.add('familyMember', 'form-row');
+              newMemberDiv.innerHTML = `
+                <div class="col">
+                  <label for="familyName">Name:</label>
+                  <input type="text" name="familyName[]" class="form-control">
+                </div>
+                <div class="col">
+                  <label for="familyBirthdate">Birthdate:</label>
+                  <input type="date" name="familyBirthdate[]" class="form-control">
+                </div>
+                <div class="col">
+                  <label for="familyRelation">Relation:</label>
+                  <input type="text" name="familyRelation[]" class="form-control">
+                </div>
+              `;
+              familyMembersDiv.appendChild(newMemberDiv);
+            });
+          </script>
+          <script>
+            document.getElementById('sameAddress').addEventListener('change', function() {
+              if (this.checked) {
+                document.getElementById('permanentAddressLine1').value = document.getElementById('currentAddressLine1').value;
+                document.getElementById('permanentStreet').value = document.getElementById('currentStreet').value;
+                document.getElementById('permanentPin').value = document.getElementById('currentPin').value;
+                document.getElementById('permanentVillage').value = document.getElementById('currentVillage').value;
+                document.getElementById('permanentCity').value = document.getElementById('currentCity').value;
+                document.getElementById('permanentState').value = document.getElementById('currentState').value;
+                document.getElementById('permanentCountry').value = document.getElementById('currentCountry').value;
+              } else {
+                document.getElementById('permanentAddressLine1').value = '';
+                document.getElementById('permanentStreet').value = '';
+                document.getElementById('permanentPin').value = '';
+                document.getElementById('permanentVillage').value = '';
+                document.getElementById('permanentCity').value = '';
+                document.getElementById('permanentState').value = '';
+                document.getElementById('permanentCountry').value = '';
+              }
+            });
+          </script>
 
-              <div class="form-group">
-                  <label for="mobile">Mobile: <span style="color: red;">*</span></label>
-                  <input type="tel" class="form-control" id="mobile" name="mobile" required pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number">
-              </div>
-
-              <button type="submit" class="btn btn-primary mt-4">Save</button>
-          </form>
 {% endblock %}

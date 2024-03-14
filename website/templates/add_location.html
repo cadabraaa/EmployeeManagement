@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} 
+{% block content%}
+    <div class="container mt-4">
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-success" role="alert">
+                      {{message}}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+      <h1>Add Location</h1>
+
+      <form method="POST" action="{{ url_for('views.add_location') }}">
+          <div>
+              <label for="location_type">Location Type:</label>
+              <select id="location_type" name="location_type">
+                  <option value="country">Country</option>
+                  <option value="state">State</option>
+                  <option value="city">City</option>
+              </select>
+          </div>
+          <div>
+              <label for="name">Name:</label>
+              <input type="text" id="name" name="name" required>
+          </div>
+          <div id="parent_id_container">
+              <label for="parent_id">Parent ID:</label>
+              <select id="parent_id" name="parent_id">
+                  <option value="">None</option>
+                  {% for country in countries %}
+                      <option value="{{ country.id }}">{{ country.country }}</option>
+                  {% endfor %}
+                  {% for state in states %}
+                      <option value="{{ state.id }}">{{ state.state }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          <div>
+              <button type="submit">Add Location</button>
+          </div>
+      </form>
+
+      {% endblock%}

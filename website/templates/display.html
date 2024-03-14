@@ -1,12 +1,419 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Photo</title>
-</head>
-<body>
-    <h1>Employee Photo</h1>
-    <img src="{{ url_for('static', filename=employee_folder+'/'+filename) }}" alt="Employee Photo">
-</body>
-</html>
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+    <div class="container mt-4">
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-success" role="alert">
+                      {{message}}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+
+      <div class="container mt-4">
+          <h1>Add Employee</h1>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary mt-4">Save</button>
+        </div>
+      </br>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+
+        <!--Profile photo upload starts-->
+                <div class="col-md-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="text-center">
+                          <div class="profile-userpic">
+                            <img id="uploadedImage" src="{{url_for('static', filename='placeholder.jpg')}}" class="img-responsive" alt="" style="width: 100%;">
+                          </div>
+                          <div class="form-group mt-3">
+                            <input type="file" class="form-control-file" id="exampleInputFile">
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">Upload</button>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+        <!--Profile photo upload ends-->
+
+
+                <div class="col-md-8">
+                  <div class="card">
+
+          <!--Navagation of employee details starts-->
+                    <div class="card-header">
+                      <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                          <a class="nav-link active" id="update-tab" data-toggle="tab" href="#update" role="tab" aria-controls="update" aria-selected="true">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Personal Details</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="address-tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">Address</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="identification-tab" data-toggle="tab" href="#identification" role="tab" aria-controls="identification" aria-selected="false">Identification</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="career-tab" data-toggle="tab" href="#career" role="tab" aria-controls="career" aria-selected="false">Career</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Documents</a>
+                        </li>
+                      </ul>
+                    </div>
+          <!--Navagation of employee details ends-->
+
+          <!--Basic required details of employee starts-->
+                    <div class="card-body">
+                      <div class="tab-content">
+                        <div class="tab-pane fade show active" id="update" role="tabpanel" aria-labelledby="update-tab">
+                          <form method="POST" action="{{ url_for('views.add_employee') }}">
+                              <div class="form-group">
+                                  <label for="first_name">First Name: <span style="color: red;">*</span></label>
+                                  <input type="text" class="form-control" id="first_name" name="first_name" required pattern="[A-Za-z]{3,}" title="Please enter a valid first name (at least 3 letters)">
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="middle_name">Middle Name (Optional):</label>
+                                  <input type="text" class="form-control" id="middle_name" name="middle_name">
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="last_name">Last Name: <span style="color: red;">*</span></label>
+                                  <input type="text" class="form-control" id="last_name" name="last_name" required pattern="[A-Za-z]{1,}" title="Please enter a valid last name (at least 1 letter)">
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="gender">Gender: <span style="color: red;">*</span></label>
+                                  <select class="form-control" id="gender" name="gender" required>
+                                      <option value="" disabled selected>Select Gender</option>
+                                      {% for gender in genders %}
+                                          <option value="{{ gender.id }}">{{ gender.gender }}</option>
+                                      {% endfor %}
+                                  </select>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="role_id">Select Role: <span style="color: red;">*</span></label>
+                                  <select class="form-control" id="role_id" name="role_id" required>
+                                      <option value="" disabled selected>Select Role</option>
+                                      {% for role in roles %}
+                                          <option value="{{ role.id }}">{{ role.role }}</option>
+                                      {% endfor %}
+                                  </select>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="email">Email: <span style="color: red;">*</span></label>
+                                  <input type="email" class="form-control" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address">
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="mobile">Mobile: <span style="color: red;">*</span></label>
+                                  <input type="tel" class="form-control" id="mobile" name="mobile" required pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number">
+                              </div>
+
+                              <button type="submit" class="btn btn-primary mt-4">Save</button>
+                          </form>
+                        </div>
+            <!--Basic required details of employee ends-->
+
+            <!--Personal details of employee starts-->
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                          <form id="userForm">
+                            <div class="form-group">
+                              <label for="maritalStatus">Education Qualifications:</label>
+                              <select id="maritalStatus" name="maritalStatus" class="form-control">
+                                <option value="Single">School Level</option>
+                                <option value="Married">Graduate</option>
+                                <option value="Divorced">Post Graduate</option>
+                                <option value="Divorced">Other</option>
+                              </select>
+                            </div>
+                            <div class="form-group">
+                              <label for="birthdate">Birthdate:</label>
+                              <input type="date" id="birthdate" name="birthdate" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="height">Height (cm):</label>
+                              <input type="number" id="height" name="height" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="weight">Weight (kg):</label>
+                              <input type="number" id="weight" name="weight" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="maritalStatus">Marital Status:</label>
+                              <select id="maritalStatus" name="maritalStatus" class="form-control">
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                              </select>
+                            </div>
+                            <div id="familyMembers">
+                              <div class="familyMember">
+                                <div class="form-row">
+                                  <div class="col">
+                                    <label for="familyName">Name:</label>
+                                    <input type="text" name="familyName[]" class="form-control">
+                                  </div>
+                                  <div class="col">
+                                    <label for="familyBirthdate">Birthdate:</label>
+                                    <input type="date" name="familyBirthdate[]" class="form-control">
+                                  </div>
+                                  <div class="col">
+                                    <label for="familyRelation">Relation:</label>
+                                    <input type="text" name="familyRelation[]" class="form-control">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <button type="button" id="addFamilyMember" class="btn btn-info mt-3">Add More Family Member</button>
+                            <div>
+                              <button type="submit" class="btn btn-primary mt-3">Save</button>
+                            </div>
+                          </form>
+                        </div>
+                        <!--Personal details of employee ends-->
+
+
+            <!--Address of employee starts-->
+                        <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                          <div class="form-group">
+                            <label for="currentAddressLine1">Address Line 1:</label>
+                            <input type="text" id="currentAddressLine1" name="currentAddressLine1" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="currentStreet">Street:</label>
+                            <input type="text" id="currentStreet" name="currentStreet" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="currentPin">PIN:</label>
+                            <input type="text" id="currentPin" name="currentPin" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="currentVillage">Village:</label>
+                            <input type="text" id="currentVillage" name="currentVillage" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="currentCity">City:</label>
+                            <select id="currentCity" name="currentCity" class="form-control">
+                              <option value="City1">City1</option>
+                              <option value="City2">City2</option>
+                              <option value="City3">City3</option>
+                            </select>
+                          </div>
+
+                          <div class="form-group">
+                            <label for="currentState">State:</label>
+                            <select id="currentState" name="currentState" class="form-control">
+                              <option value="State1">State1</option>
+                              <option value="State2">State2</option>
+                              <option value="State3">State3</option>
+                            </select>
+                          </div>
+
+                          <div class="form-group">
+                            <label for="currentCountry">Country:</label>
+                            <select id="currentCountry" name="currentCountry" class="form-control">
+                              <option value="Country1">Country1</option>
+                              <option value="Country2">Country2</option>
+                              <option value="Country3">Country3</option>
+                            </select>
+                          </div>
+                          <br>
+                          <hr>
+
+                          <input type="checkbox" id="sameAddress" name="sameAddress" class="form-check-input">
+
+                          <label for="sameAddress" class="form-check-label">Same as Current Address</label><br><br>
+
+                          <div class="form-group">
+                            <label for="permanentAddressLine1">Permanent Address Line 1:</label>
+                            <input type="text" id="permanentAddressLine1" name="permanentAddressLine1" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="permanentStreet">Street:</label>
+                            <input type="text" id="permanentStreet" name="permanentStreet" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="permanentPin">PIN:</label>
+                            <input type="text" id="permanentPin" name="permanentPin" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="permanentVillage">Village:</label>
+                            <input type="text" id="permanentVillage" name="permanentVillage" class="form-control">
+                          </div>
+
+                          <div class="form-group">
+                            <label for="permanentCity">City:</label>
+                            <select id="permanentCity" name="permanentCity" class="form-control">
+                              <option value="City1">City1</option>
+                              <option value="City2">City2</option>
+                              <option value="City3">City3</option>
+                            </select>
+                          </div>
+
+                          <div class="form-group">
+                            <label for="permanentState">State:</label>
+                            <select id="permanentState" name="permanentState" class="form-control">
+                              <option value="State1">State1</option>
+                              <option value="State2">State2</option>
+                              <option value="State3">State3</option>
+                            </select>
+                          </div>
+
+                          <div class="form-group">
+                            <label for="permanentCountry">Country:</label>
+                            <select id="permanentCountry" name="permanentCountry" class="form-control">
+                              <option value="Country1">Country1</option>
+                              <option value="Country2">Country2</option>
+                              <option value="Country3">Country3</option>
+                            </select>
+                          </div>
+                          <button type="submit" class="btn btn-primary mt-4">Save</button>
+                        </div>
+            <!--Address of employee ends-->
+
+
+            <!--Identification of employee starts-->
+                        <div class="tab-pane fade" id="identification" role="tabpanel" aria-labelledby="identification-tab">
+                          <form id="userForm">
+                              <div class="form-group">
+                                <label for="aadhar">Aadhar:</label>
+                                <input type="text" id="aadhar" name="aadhar" class="form-control">
+                              </div>
+
+                              <div class="form-group">
+                                <label for="pan">PAN:</label>
+                                <input type="text" id="pan" name="pan" class="form-control">
+                              </div>
+
+                              <div class="form-group">
+                                <label for="drivingLicense">Driving License:</label>
+                                <input type="text" id="drivingLicense" name="drivingLicense" class="form-control">
+                              </div>
+
+                              <div class="form-group">
+                                <label for="passport">Passport:</label>
+                                <input type="text" id="passport" name="passport" class="form-control">
+                              </div>
+
+                              <div id="additionalFields"></div>
+
+                              <button type="button" id="addMoreFields" class="btn btn-info mt-3">Add More</button>
+                              <div>
+                              <button type="submit" class="btn btn-primary mt-3">Save</button>
+                              </div>
+                           </form>
+                        </div>
+              <!--Identification of employee ends-->
+
+            <!--Career of employee starts-->	
+                      <div class="tab-pane fade" id="career" role="tabpanel" aria-labelledby="career-tab"> 
+            Career
+                      </div>
+            <!--Career of employee ends-->
+
+            <!--Documents of employee starts-->	
+                      <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab"> 
+            documents
+                      </div>
+            <!--Career of employee ends-->
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('exampleInputFile').addEventListener('change', function() {
+              const file = this.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                  document.getElementById('uploadedImage').src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+              }
+            });
+          });
+        </script>
+          <script>
+            document.getElementById('sameAddress').addEventListener('change', function() {
+              if (this.checked) {
+                document.getElementById('permanentAddressLine1').value = document.getElementById('currentAddressLine1').value;
+                document.getElementById('permanentStreet').value = document.getElementById('currentStreet').value;
+                document.getElementById('permanentPin').value = document.getElementById('currentPin').value;
+                document.getElementById('permanentVillage').value = document.getElementById('currentVillage').value;
+                document.getElementById('permanentCity').value = document.getElementById('currentCity').value;
+                document.getElementById('permanentState').value = document.getElementById('currentState').value;
+                document.getElementById('permanentCountry').value = document.getElementById('currentCountry').value;
+              } else {
+                document.getElementById('permanentAddressLine1').value = '';
+                document.getElementById('permanentStreet').value = '';
+                document.getElementById('permanentPin').value = '';
+                document.getElementById('permanentVillage').value = '';
+                document.getElementById('permanentCity').value = '';
+                document.getElementById('permanentState').value = '';
+                document.getElementById('permanentCountry').value = '';
+              }
+            });
+
+            document.getElementById('addFamilyMember').addEventListener('click', function() {
+              var familyMembersDiv = document.getElementById('familyMembers');
+              var newMemberDiv = document.createElement('div');
+              newMemberDiv.classList.add('familyMember', 'form-row');
+              newMemberDiv.innerHTML = `
+                <div class="col">
+                  <label for="familyName">Name:</label>
+                  <input type="text" name="familyName[]" class="form-control">
+                </div>
+                <div class="col">
+                  <label for="familyBirthdate">Birthdate:</label>
+                  <input type="date" name="familyBirthdate[]" class="form-control">
+                </div>
+                <div class="col">
+                  <label for="familyRelation">Relation:</label>
+                  <input type="text" name="familyRelation[]" class="form-control">
+                </div>
+              `;
+              familyMembersDiv.appendChild(newMemberDiv);
+            });
+          </script>
+      <script>
+        document.getElementById('addMoreFields').addEventListener('click', function() {
+          var additionalFieldsDiv = document.getElementById('additionalFields');
+          var newFieldDiv = document.createElement('div');
+          newFieldDiv.classList.add('form-group');
+          newFieldDiv.innerHTML = `
+            <label for="additionalField">Additional Field:</label>
+            <input type="text" name="additionalField[]" class="form-control">
+          `;
+          additionalFieldsDiv.appendChild(newFieldDiv);
+        });
+      </script>
+
+{% endblock %}
