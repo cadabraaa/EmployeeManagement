@@ -40,13 +40,32 @@ def employee():
 
 @views.route('/employee_details/<employee_id>', methods=['GET'])
 @login_required
+@cross_origin()
 def employee_details(employee_id):
     employee = Employee.query.filter_by(employee_id=employee_id).first()
     if employee:
-        return render_template("employee_details.html", employee=employee,user=current_user)
+        identification = Identification.query.filter_by(employee_id=employee.employee_id).first()
+        family = Family.query.filter_by(employee_id=employee.employee_id).all()
+        caddress = Caddress.query.filter_by(employee_id=employee.employee_id).first()
+        paddress = Paddress.query.filter_by(employee_id=employee.employee_id).first()
+        weapons = Weapon.query.filter_by(employee_id=employee.employee_id).all()
+        careers = Career.query.filter_by(employee_id=employee.employee_id).all()
+        army = Army.query.filter_by(employee_id=employee.employee_id).all()
+
+        return render_template(
+          "employee_details.html", 
+          employee=employee, 
+          identification=identification, 
+          family=family,
+          caddress=caddress,
+          paddress=paddress,
+          weapons=weapons,
+          careers=careers,
+          army=army,
+          user=current_user)
     else:
         flash('Employee not found.', category='error')
-        return redirect(url_for('views.employee_list')) 
+        return redirect(url_for('views.employee_list'))
 
   
 ######## ADD EMPLOYEE ########
@@ -253,9 +272,109 @@ def add_employee():
         cities=cities
     )
 
+######## EDIT EMPLOYEE ########
 
+@views.route('/edit_employee/<employee_id>', methods=['GET', 'POST'])
+@login_required
+def edit_employee(employee_id):
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    if not employee:
+        flash('Employee not found.', category='error')
+        return redirect(url_for('views.employee_list'))
 
+    if request.method == 'POST':
+        first_name = request.form.get('first_name')
+        middle_name = request.form.get('middle_name')
+        last_name = request.form.get('last_name')
+        gender_id = request.form.get('gender')
+        email = request.form.get('email')
+        mobile = request.form.get('mobile')
+        role_id = request.form.get('role_id')
+        birthdate = request.form.get('birthdate')
+        height = request.form.get('height')
+        weight = request.form.get('weight')
+        education_id = request.form.get('education_id')
+        marital_id = request.form.get('marital_id')
+        family_names = request.form.getlist('familyName[]')
+        family_birthdates = request.form.getlist('familyBirthdate[]')
+        family_relations = request.form.getlist('familyRelation[]')
+        pan = request.form.get('pan')
+        aadhar = request.form.get('aadhar')
+        voter = request.form.get('voter')
+        passport = request.form.get('passport')
+        dl = request.form.get('dl')
+        caddress_line1 = request.form.get('caddress_line1')
+        cstreet = request.form.get('cstreet')
+        cpin = request.form.get('cpin')
+        cvillage = request.form.get('cvillage')
+        ccity_id = request.form.get('ccity_id')
+        cstate_id = request.form.get('cstate_id')
+        ccountry_id = request.form.get('ccountry_id')
+        paddress_line1 = request.form.get('paddress_line1')
+        pstreet = request.form.get('pstreet')
+        ppin = request.form.get('ppin')
+        pvillage = request.form.get('pvillage')
+        pcity_id = request.form.get('pcity_id')
+        pstate_id = request.form.get('pstate_id')
+        pcountry_id = request.form.get('pcountry_id')
+        weapon = request.form.getlist('weapon[]')
+        license = request.form.getlist('license[]')
+        career_companies = request.form.getlist('careerCompany[]')
+        career_joiningdates = request.form.getlist('careerJoiningdate[]')
+        career_leavingdates = request.form.getlist('careerLeavingdate[]')
+        force = request.form.get('force')
+        joining = request.form.get('joining')
+        leaving = request.form.get('leaving')
+        
 
+        if not first_name or not last_name or not email or not mobile:
+            flash('All fields are required.', category='error')
+        else:
+            try:
+                
+                employee.first_name = first_name
+                employee.middle_name = middle_name
+                employee.last_name = last_name
+                employee.gender_id = gender_id
+                employee.email = email
+                employee.mobile = mobile
+                employee.role_id = role_id
+                employee.birthdate = birthdate
+                employee.height = height
+                employee.weight = weight
+                employee.education_id = education_id
+                employee.marital_id = marital_id
+                
+
+                db.session.commit()
+                flash('Employee details updated successfully!', category='success')
+                return redirect(url_for('views.employee_details', employee_id=employee_id))
+
+            except Exception as e:
+                db.session.rollback()
+                flash(f'An error occurred: {str(e)}', category='error')
+
+    
+    genders = Gender.query.all()
+    educations = Education.query.all()
+    maritals = Marital.query.all()
+    countries = Country.query.all()
+    states = State.query.all()
+    cities = City.query.all()
+    roles = Role.query.filter_by(user_id=current_user.id).all()
+
+    
+    return render_template(
+        "employee_edit.html",
+        employee=employee,
+        genders=genders,
+        educations=educations,
+        maritals=maritals,
+        countries=countries,
+        states=states,
+        cities=cities,
+        roles=roles
+    )
 
 
 ######## ADD ROLES ########

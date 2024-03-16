@@ -56,19 +56,19 @@
                   <tbody>
                     <tr>
                       <th><strong>Birthdate</strong></th>
-                      <td>2/2/1980</td>
+                      <td>{{ employee.birthdate }}</td>
                     </tr>
                     <tr>
-                      <th><strong>Height</strong></th>
-                      <td>6'0" (6feet 0inches))</td>
+                      <th><strong>Height (cm)</strong></th>
+                      <td>{{ employee.height }}</td>
                     </tr>
                     <tr>
-                      <th><strong>Weight</strong></th>
-                      <td>78kg (Pounds)</td>
+                      <th><strong>Weight (kg)</strong></th>
+                      <td>{{ employee.weight }}</td>
                     </tr>
                     <tr>
                       <th><strong>Marital Status</strong></th>
-                      <td>Married</td>
+                      <td>{{ employee.marital.marital}}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -80,26 +80,26 @@
               </div>
                 <table class="table profile__table">
                   <tbody>
-                    <tr>
-                      <th><strong>Aadhar Number</strong></th>
-                      <td>6310-9090-9090-9090</td>
-                    </tr>
-                    <tr>
-                      <th><strong>PAN</strong></th>
-                      <td>ABCDE12345F</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Driving License</strong></th>
-                      <td>6310-9090-9090-9090</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Voter ID</strong></th>
-                      <td>6310-9090-9090-9090</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Passport Number</strong></th>
-                      <td>6310-9090-9090-9090</td>
-                    </tr>
+                      <tr>
+                          <th><strong>Aadhar Number</strong></th>
+                          <td>{{ identification.aadhar }}</td>
+                      </tr>
+                      <tr>
+                          <th><strong>PAN</strong></th>
+                          <td>{{ identification.pan }}</td>
+                      </tr>
+                      <tr>
+                          <th><strong>Voter ID</strong></th>
+                          <td>{{ identification.voter }}</td>
+                      </tr>
+                      <tr>
+                          <th><strong>Driving License</strong></th>
+                          <td>{{ identification.dl }}</td>
+                      </tr>
+                      <tr>
+                          <th><strong>Passport Number</strong></th>
+                          <td>{{ identification.passport }}</td>
+                      </tr>
                   </tbody>
                 </table>
             </div>
@@ -113,20 +113,17 @@
                   <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Relation</th>
-                    <th scope="col">Age (Years)</th>
+                    <th scope="col">Birthdate</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {% for member in family %}
                   <tr>
-                    <td>Ravi Kumar</td>
-                    <td>Father</td>
-                    <td>60</td>
+                    <td>{{ member.fullname }}</td>
+                    <td>{{ member.relation }}</td>
+                    <td>{{ member.birthdate }}</td>
                   </tr>
-                  <tr>
-                    <td>Namita Kumari</td>
-                    <td>Mother</td>
-                    <td>55</td>
-                  </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>
@@ -140,10 +137,13 @@
                       <li class="list-group-item list-group-item-dark">
                         <strong>Current Address</strong>
                       </li>
-                      <li class="list-group-item">123 Main Street</li>
-                      <li class="list-group-item">City</li>
-                      <li class="list-group-item">State</li>
-                      <li class="list-group-item">Country</li>
+                      <li class="list-group-item">Address : {{ caddress.address_line1 }}</li>
+                      <li class="list-group-item">{{ caddress.street }}</li>
+                      <li class="list-group-item">{{ caddress.village }}</li>
+                      <li class="list-group-item">{{ caddress.pin }}</li>
+                      <li class="list-group-item">{{ caddress.city.city }}</li>
+                      <li class="list-group-item">{{ caddress.state.state }}</li>
+                      <li class="list-group-item">{{ caddress.country.country }}</li>
                     </ul>
                   </div>
                   <div class="col-md-6">
@@ -151,10 +151,13 @@
                       <li class="list-group-item list-group-item-dark">
                         <strong>Permanent Address</strong>
                       </li>
-                      <li class="list-group-item">456 Oak Avenue</li>
-                      <li class="list-group-item">Town</li>
-                      <li class="list-group-item">Province</li>
-                      <li class="list-group-item">Country</li>
+                      <li class="list-group-item">Address : {{ paddress.address_line1 }}</li>
+                      <li class="list-group-item">{{ paddress.street }}</li>
+                      <li class="list-group-item">{{ paddress.village }}</li>
+                      <li class="list-group-item">{{ paddress.pin }}</li>
+                      <li class="list-group-item">{{ paddress.city.city }}</li>
+                      <li class="list-group-item">{{ paddress.state.state }}</li>
+                      <li class="list-group-item">{{ paddress.country.country }}</li>
                     </ul>
                   </div>
                 </div>
@@ -168,23 +171,33 @@
                 <table class="table profile__table">
                   <tbody>
                     <tr>
-                      <th><strong>Birthdate</strong></th>
-                      <td>2/2/1980</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Height</strong></th>
-                      <td>6'0" (6feet 0inches))</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Weight</strong></th>
-                      <td>78kg (Pounds)</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Marital Status</strong></th>
-                      <td>Married</td>
+                      <th><strong>Highest Qualification</strong></th>
+                      <td>{{employee.education.education}}</td>
                     </tr>
                   </tbody>
                 </table>
+            </div>
+            <!-- Weapon -->
+            <div class="card mb-3">
+            <div class="card-header">
+              <h4 class="card-title">Weapon</h4>
+              </div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Weapon Type</th>
+                    <th scope="col">License Number</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for weapon in weapons %}
+                  <tr>
+                    <td>{{ weapon.weapon }}</td>
+                    <td>{{ weapon.license }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
             <!-- Experience -->
             <div class="card mb-3">
@@ -192,40 +205,24 @@
                 <h4 class="card-title">Experience</h4>
               </div>
                 <section class="py-5">
+                  {% for career in careers %}
                   <ul class="timeline">
                     <li class="timeline-item mb-5">
-                      <h5 class="fw-bold">Our company starts its operations</h5>
-                      <p class="text-muted mb-2 fw-bold">11 March 2020</p>
-                      <p class="text-muted">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit
-                        necessitatibus adipisci, ad alias, voluptate pariatur officia
-                        repellendus repellat inventore fugit perferendis totam dolor
-                        voluptas et corrupti distinctio maxime corporis optio?
-                      </p>
-                    </li>
-                    <li class="timeline-item mb-5">
-                      <h5 class="fw-bold">Our team exceeds 10 people</h5>
-                      <p class="text-muted mb-2 fw-bold">24 June 2020</p>
-                      <p class="text-muted">
-                        Orci varius natoque penatibus et magnis dis parturient montes,
-                        nascetur ridiculus mus. Nulla ullamcorper arcu lacus, maximus
-                        facilisis erat pellentesque nec. Duis et dui maximus dui aliquam
-                        convallis. Quisque consectetur purus erat, et ullamcorper sapien
-                        tincidunt vitae.
-                      </p>
-                    </li>
-
-                    <li class="timeline-item mb-5">
-                      <h5 class="fw-bold">Earned the first million $!</h5>
-                      <p class="text-muted mb-2 fw-bold">15 October 2020</p>
-                      <p class="text-muted">
-                        Nulla ac tellus convallis, pulvinar nulla ac, fermentum diam. Sed
-                        et urna sit amet massa dapibus tristique non finibus ligula. Nam
-                        pharetra libero nibh, id feugiat tortor rhoncus vitae. Ut suscipit
-                        vulputate mattis.
-                      </p>
+                      <h5 class="fw-bold">Company Name : {{career.company}}</h5>
+                      <p class="text-muted mb-2 fw-bold">Joining Date : {{ career.joiningdate }}</p>
+                      <p class="text-muted mb-2 fw-bold">Joining Date : {{ career.leavingdate }}</p>
                     </li>
                   </ul>
+                  {% endfor %}
+                  {% for army in army %}
+                    <ul class="timeline">
+                      <li class="timeline-item mb-5">
+                        <h5 class="fw-bold">Indian Defence Force : {{ army.force }}</h5>
+                        <p class="text-muted mb-2 fw-bold"> Joining Date : {{ army.joining }}</p>
+                        <p class="text-muted mb-2 fw-bold">Leaving Date : {{ army.leaving }}</p>
+                      </li>
+                    </ul>
+                  {% endfor %}
                 </section>
             </div>
 
