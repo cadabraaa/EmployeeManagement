@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 from sqlalchemy import BigInteger
 
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     company_code = db.Column(db.String(3), unique=True, nullable=False)
@@ -30,7 +31,15 @@ class Employee(db.Model):
     education_id = db.Column(db.Integer, db.ForeignKey('education.id'))
     marital_id = db.Column(db.Integer, db.ForeignKey('marital.id'))
     families = db.relationship('Family', backref='employee', lazy=True)
+    photos = db.relationship('Photo', backref='employee', lazy=True)
+    Identification = db.relationship('Identification', backref='employee', lazy=True)
+    caddress = db.relationship('Caddress', backref='employee', uselist=False)
+    paddress = db.relationship('Paddress', backref='employee', uselist=False)
+    weapons = db.relationship('Weapon', backref='employee', lazy=True)
+    careers = db.relationship('Career', backref='employee', lazy=True)
+    army = db.relationship('Army', backref='employee', lazy=True)
     
+
 
 class Gender(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
@@ -61,22 +70,81 @@ class Family(db.Model, UserMixin):
   fullname = db.Column(db.String(150))
   relation = db.Column(db.String(50))
   birthdate = db.Column(db.Date)
-  
 
+class Photo(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  path = db.Column(db.String(255), unique=True)
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+
+class Identification(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  pan = db.Column(db.String(255))
+  aadhar = db.Column(db.String(255))
+  voter = db.Column(db.String(255))
+  dl = db.Column(db.String(255))
+  passport = db.Column(db.String(255))
+  employee_id = db.Column(db.String(50), db.ForeignKey('employee.employee_id'))
+
+class Weapon(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+  weapon = db.Column(db.String(150))
+  license = db.Column(db.String(150))
+
+class Career(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+  company = db.Column(db.String(150))
+  joiningdate = db.Column(db.Date)
+  leavingdate = db.Column(db.Date)
+
+class Army(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+  force = db.Column(db.String(150))
+  joining = db.Column(db.Date)
+  leaving = db.Column(db.Date)
+
+
+class Caddress(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  address_line1 = db.Column(db.String(255))
+  street = db.Column(db.String(100))
+  pin = db.Column(db.BigInteger)
+  village = db.Column(db.String(100))
+  city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
+  state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
+  country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
+  city = db.relationship('City', backref='caddress')
+  state = db.relationship('State', backref='caddress')
+  country = db.relationship('Country', backref='caddress')
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+
+class Paddress(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  address_line1 = db.Column(db.String(255))
+  street = db.Column(db.String(100))
+  pin = db.Column(db.BigInteger)
+  village = db.Column(db.String(100))
+  city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
+  state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
+  country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
+  city = db.relationship('City', backref='paddress')
+  state = db.relationship('State', backref='paddress')
+  country = db.relationship('Country', backref='paddress')
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
 
 
 class Country(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   country = db.Column(db.String(150), unique=True)
-  
+  states = db.relationship('State', backref='country')
 
 class State(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   state = db.Column(db.String(150), unique=True)
   country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
-  country = db.relationship('Country', backref='states')
   cities = db.relationship('City', backref='state', lazy=True)
- 
 
 class City(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)

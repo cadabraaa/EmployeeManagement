@@ -13,21 +13,21 @@
       <h1>Add Location</h1>
 
       <form method="POST" action="{{ url_for('views.add_location') }}">
-          <div>
+          <div class="form-group">
               <label for="location_type">Location Type:</label>
-              <select id="location_type" name="location_type">
+              <select class="form-control" id="location_type" name="location_type">
                   <option value="country">Country</option>
                   <option value="state">State</option>
                   <option value="city">City</option>
               </select>
           </div>
-          <div>
+          <div class="form-group">
               <label for="name">Name:</label>
-              <input type="text" id="name" name="name" required>
+              <input type="text" class="form-control" id="name" name="name" required>
           </div>
-          <div id="parent_id_container">
+          <div class="form-group" id="parent_id_container">
               <label for="parent_id">Parent ID:</label>
-              <select id="parent_id" name="parent_id">
+              <select class="form-control" id="parent_id" name="parent_id">
                   <option value="">None</option>
                   {% for country in countries %}
                       <option value="{{ country.id }}">{{ country.country }}</option>
@@ -37,8 +37,8 @@
                   {% endfor %}
               </select>
           </div>
-          <div>
-              <button type="submit">Add Location</button>
+          <div class="form-group">
+              <button type="submit" class="btn btn-primary">Add Location</button>
           </div>
       </form>
 

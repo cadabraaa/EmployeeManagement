@@ -15,8 +15,26 @@
       <div class="container mt-4">
           <h1>Add Employee</h1>
         <div class="container">
+          <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="text-center">
+                    <div class="profile-userpic">
+                      <img id="uploadedImage" src="{{url_for('static', filename='placeholder.jpg')}}" class="img-responsive" alt="" style="width: 100%;">
+                    </div>
+                    <div class="form-group mt-3">
+                      <input type="file" class="form-control-file" id="exampleInputFile">
+                    </div>
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="submit">Upload</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
 
         <form method="POST" action="{{ url_for('views.add_employee') }}">
+          
             <div class="form-group">
                 <label for="first_name">First Name: <span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="first_name" name="first_name" required pattern="[A-Za-z]{3,}" title="Please enter a valid first name (at least 3 letters)">
@@ -117,14 +135,250 @@
             </div>
           </div>
           <button type="button" id="addFamilyMember" class="btn btn-info mt-3">Add More Family Member</button>
+        </br>
+          </br>
           <div>
+          
             
+               <div class="form-group">
+                   <label for="aadhar">Aadhar:</label>
+                   <input type="text" id="aadhar" name="aadhar" class="form-control">
+               </div>
+
+               <div class="form-group">
+                   <label for="pan">PAN:</label>
+                   <input type="text" id="pan" name="pan" class="form-control">
+               </div>
+
+               <div class="form-group">
+                   <label for="voter">Voter ID:</label>
+                   <input type="text" id="voter" name="voter" class="form-control">
+               </div>
+
+               <div class="form-group">
+                   <label for="dl">Driving License:</label>
+                   <input type="text" id="dl" name="dl" class="form-control">
+               </div>
+
+               <div class="form-group">
+                   <label for="passport">Passport:</label>
+                   <input type="text" id="passport" name="passport" class="form-control">
+               </div>
+
+          </br>
+
+            <div>
+              <label>Do you have a weapon?</label><br>
+              <input type="radio" name="hasWeapon" value="yes" id="hasWeaponYes">
+              <label for="hasWeaponYes">Yes</label>
+              <input type="radio" name="hasWeapon" value="no" id="hasWeaponNo" checked>
+              <label for="hasWeaponNo">No</label>
+            </div>
+
+            <div id="weaponForm" style="display: none;">
+              <div class="weapon">
+                  <div class="form-row">
+                      <div class="col">
+                          <label for="weapon">Weapon Type:</label>
+                          <input type="text" name="weapon[]" class="form-control">
+                      </div>
+                      <div class="col">
+                          <label for="license">License Number:</label>
+                          <input type="text" name="license[]" class="form-control">
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <button type="button" id="addweapon" class="btn btn-info mt-3">Add More</button>
+            </br>
+            </br>
+            
+
+
+            
+
+            <div class="form-group">
+                <label for="caddress_line1">Address Line 1:</label>
+                <input type="text" id="caddress_line1" name="caddress_line1" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="cstreet">Street:</label>
+                <input type="text" id="cstreet" name="cstreet" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="cpin">PIN:</label>
+                <input type="text" id="cpin" name="cpin" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="cvillage">Village:</label>
+                <input type="text" id="cvillage" name="cvillage" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="ccity_id">City:</label>
+                <select id="ccity_id" name="ccity_id" class="form-control">
+
+                     <option value="" disabled selected>Select City</option>
+                  {% for city in cities %}
+                        <option value="{{ city.id }}">{{ city.city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="cstate_id">State:</label>
+                <select id="cstate_id" name="cstate_id" class="form-control">
+                    <option value="" disabled selected>Select State</option>
+                    {% for state in states %}
+                    <option value="{{ state.id }}">{{ state.state }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="ccountry_id">Country:</label>
+                <select id="ccountry_id" name="ccountry_id" class="form-control">
+                    <option value="" disabled selected>Select Country</option>
+                    {% for country in countries %}
+                    <option value="{{ country.id }}">{{ country.country }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+            <hr>
+
+            <input type="checkbox" id="sameAddress" name="sameAddress" class="form-check-input">
+            <label for="sameAddress" class="form-check-label">Same as Current Address</label><br><br>
+
+            <div class="form-group">
+                <label for="paddress_line1">Permanent Address Line 1:</label>
+                <input type="text" id="paddress_line1" name="paddress_line1" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="pstreet">Street:</label>
+                <input type="text" id="pstreet" name="pstreet" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="ppin">PIN:</label>
+                <input type="text" id="ppin" name="ppin" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="pvillage">Village:</label>
+                <input type="text" id="pvillage" name="pvillage" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="pcity_id">City:</label>
+                <select id="pcity_id" name="pcity_id" class="form-control">
+                    <option value="" disabled selected>Select City</option>
+                    {% for city in cities %}
+                    <option value="{{ city.id }}">{{ city.city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pstate_id">State:</label>
+                <select id="pstate_id" name="pstate_id" class="form-control">
+                    <option value="" disabled selected>Select State</option>
+                    {% for state in states %}
+                    <option value="{{ state.id }}">{{ state.state }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pcountry_id">Country:</label>
+                <select id="pcountry_id" name="pcountry_id" class="form-control">
+                    <option value="" disabled selected>Select Country</option>
+                    {% for country in countries %}
+                    <option value="{{ country.id }}">{{ country.country }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+
+            <!-- Add radio buttons to ask if the user is experienced -->
+            <div class="form-group">
+                <label>Are you experienced?</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="experiencedRadio" id="yesRadio" value="yes">
+                    <label class="form-check-label" for="yesRadio">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="experiencedRadio" id="noRadio" value="no" checked>
+                    <label class="form-check-label" for="noRadio">No</label>
+                </div>
+            </div>
+
+            <!-- Career fields -->
+            <div id="careerFields" style="display: none;">
+                <div class="career-field">
+                    <div class="form-group">
+                        <label for="companyName">Company Name:</label>
+                        <input type="text" name="careerCompany[]" class="form-control">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="careerJoiningdate">Joing Date:</label>
+                            <input type="date" name="careerJoiningdate[]" class="form-control">
+                        </div>
+                        <div class="form-group col">
+                            <label for="careerLeavingdate">Leaving Date:</label>
+                            <input type="date" name="careerLeavingdate[]" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="addCareerField" class="btn btn-info mt-3" style="display: none;">Add More</button>
+            </br>  
+            </br> 
+            <div class="form-group">
+                <label>Have you served Indian Defence Force?</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="indianArmyRadio" id="yesIndianArmyRadio" value="yes">
+                    <label class="form-check-label" for="yesIndianArmyRadio">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="indianArmyRadio" id="noIndianArmyRadio" value="no" checked>
+                    <label class="form-check-label" for="noIndianArmyRadio">No</label>
+                </div>
+            </div>
+
+            <!-- Indian Army fields -->
+            <div id="indianArmyFields" style="display: none;">
+                <div class="form-group">
+                    <label for="forceName">Name of Force:</label>
+                    <input type="text" name="force" class="form-control">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="joining">Joining Date:</label>
+                        <input type="date" name="joining" class="form-control">
+                    </div>
+                    <div class="form-group col">
+                        <label for="leaving">Leaving Date:</label>
+                        <input type="date" name="leaving" class="form-control">
+                    </div>
+                </div>
+            </div>
+          </br>
+            </br>
+
             <button type="submit" class="btn btn-primary mt-4">Save</button>
         </form>
         </br>
+        </br>
 
          
-           <script>
+          <script>
              document.addEventListener('DOMContentLoaded', function() {
                document.getElementById('exampleInputFile').addEventListener('change', function() {
                  const file = this.files[0];
@@ -139,7 +393,7 @@
              });
            </script>
           <script>
-           
+
             document.getElementById('addFamilyMember').addEventListener('click', function() {
               var familyMembersDiv = document.getElementById('familyMembers');
               var newMemberDiv = document.createElement('div');
@@ -162,25 +416,96 @@
             });
           </script>
           <script>
-            document.getElementById('sameAddress').addEventListener('change', function() {
-              if (this.checked) {
-                document.getElementById('permanentAddressLine1').value = document.getElementById('currentAddressLine1').value;
-                document.getElementById('permanentStreet').value = document.getElementById('currentStreet').value;
-                document.getElementById('permanentPin').value = document.getElementById('currentPin').value;
-                document.getElementById('permanentVillage').value = document.getElementById('currentVillage').value;
-                document.getElementById('permanentCity').value = document.getElementById('currentCity').value;
-                document.getElementById('permanentState').value = document.getElementById('currentState').value;
-                document.getElementById('permanentCountry').value = document.getElementById('currentCountry').value;
-              } else {
-                document.getElementById('permanentAddressLine1').value = '';
-                document.getElementById('permanentStreet').value = '';
-                document.getElementById('permanentPin').value = '';
-                document.getElementById('permanentVillage').value = '';
-                document.getElementById('permanentCity').value = '';
-                document.getElementById('permanentState').value = '';
-                document.getElementById('permanentCountry').value = '';
-              }
-            });
+              document.getElementById('sameAddress').addEventListener('change', function() {
+                  if (this.checked) {
+                      // Set permanent address fields to current address values
+                      document.getElementById('paddress_line1').value = document.getElementById('caddress_line1').value;
+                      document.getElementById('pstreet').value = document.getElementById('cstreet').value;
+                      document.getElementById('ppin').value = document.getElementById('cpin').value;
+                      document.getElementById('pvillage').value = document.getElementById('cvillage').value;
+                      document.getElementById('pcity_id').value = document.getElementById('ccity_id').value;
+                      document.getElementById('pstate_id').value = document.getElementById('cstate_id').value;
+                      document.getElementById('pcountry_id').value = document.getElementById('ccountry_id').value;
+                  } else {
+                      // Clear permanent address fields
+                      document.getElementById('paddress_line1').value = '';
+                      document.getElementById('pstreet').value = '';
+                      document.getElementById('ppin').value = '';
+                      document.getElementById('pvillage').value = '';
+                      document.getElementById('pcity_id').value = '';
+                      document.getElementById('pstate_id').value = '';
+                      document.getElementById('pcountry_id').value = '';
+                  }
+              });
           </script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const hasWeaponYes = document.getElementById("hasWeaponYes");
+                    const weaponForm = document.getElementById("weaponForm");
 
+                    hasWeaponYes.addEventListener("change", function() {
+                        if (hasWeaponYes.checked) {
+                            weaponForm.style.display = "block";
+                        } else {
+                            weaponForm.style.display = "none";
+                        }
+                    });
+
+                    document.getElementById("addweapon").addEventListener("click", function() {
+                        // Create new weapon fields and append to the form
+                        const weapon = document.createElement("div");
+                        weapon.className = "weapon";
+                        weapon.innerHTML = `
+                            <div class="form-row">
+                                <div class="col">
+                                    <label for="weapon">Weapon Type:</label>
+                                    <input type="text" name="weapon[]" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <label for="license">License Number:</label>
+                                    <input type="text" name="license[]" class="form-control">
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById("weaponForm").appendChild(weapon);
+                    });
+                });
+            </script>
+
+          <script>
+              const yesRadio = document.getElementById("yesRadio");
+              const careerFields = document.getElementById("careerFields");
+              const addCareerFieldButton = document.getElementById("addCareerField");
+
+              yesRadio.addEventListener("change", function() {
+                  if (this.checked) {
+                      careerFields.style.display = "block";
+                      addCareerFieldButton.style.display = "block";
+                  } else {
+                      careerFields.style.display = "none";
+                      addCareerFieldButton.style.display = "none";
+                  }
+              });
+
+              document.getElementById("addCareerField").addEventListener("click", function() {
+                  const clone = careerFields.firstElementChild.cloneNode(true);
+                  // Clear input values in the cloned fields
+                  clone.querySelectorAll("input").forEach(function(input) {
+                      input.value = "";
+                  });
+                  careerFields.appendChild(clone);
+              });
+          </script>
+          <script>
+              const yesIndianArmyRadio = document.getElementById("yesIndianArmyRadio");
+              const indianArmyFields = document.getElementById("indianArmyFields");
+
+              yesIndianArmyRadio.addEventListener("change", function() {
+                  if (this.checked) {
+                      indianArmyFields.style.display = "block";
+                  } else {
+                      indianArmyFields.style.display = "none";
+                  }
+              });
+          </script>
 {% endblock %}

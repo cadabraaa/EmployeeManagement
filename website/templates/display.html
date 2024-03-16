@@ -328,11 +328,65 @@
                         </div>
               <!--Identification of employee ends-->
 
-            <!--Career of employee starts-->	
-                      <div class="tab-pane fade" id="career" role="tabpanel" aria-labelledby="career-tab"> 
-            Career
-                      </div>
-            <!--Career of employee ends-->
+                        <!--Career of employee starts-->	
+                                  <div class="tab-pane fade" id="career" role="tabpanel" aria-labelledby="career-tab"> 
+                                    <form id="userForm">
+                                      <div class="form-group row">
+                                        <div class="col-sm-3">
+                                          <input type="checkbox" id="experienced" name="experienced" class="form-check-input">
+                                          <label for="experienced" class="form-check-label">Experienced</label>
+                                          <button type="button" id="addExperienceFields" class="btn btn-primary mt-2" style="display: none;">Add More</button>
+                                        </div>
+                                        <div class="col-sm-9">
+                                          <div id="experiencedFields" style="display: none;">
+                                            <div class="form-group">
+                                              <label for="companyName">Company Name:</label>
+                                              <input type="text" id="companyName" name="companyName" class="form-control">
+                                            </div>
+                                            <div class="form-row">
+                                              <div class="form-group col">
+                                                <label for="experienceYears">Years of Experience:</label>
+                                                <input type="number" id="experienceYears" name="experienceYears" class="form-control">
+                                              </div>
+                                              <div class="form-group col">
+                                                <label for="experienceMonths">Months of Experience:</label>
+                                                <input type="number" id="experienceMonths" name="experienceMonths" class="form-control">
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div class="form-group row">
+                                        <div class="col-sm-3">
+                                          <input type="checkbox" id="indianDefence" name="indianDefence" class="form-check-input">
+                                          <label for="indianDefence" class="form-check-label">Served in Indian Defence</label>
+                                          <button type="button" id="addDefenceFields" class="btn btn-primary mt-2" style="display: none;">Add More</button>
+                                        </div>
+                                        <div class="col-sm-9">
+                                          <div id="defenceFields" style="display: none;">
+                                            <div class="form-group">
+                                              <label for="forceName">Name of Force:</label>
+                                              <input type="text" id="forceName" name="forceName" class="form-control">
+                                            </div>
+                                            <div class="form-row">
+                                              <div class="form-group col">
+                                                <label for="serviceYears">Years of Service:</label>
+                                                <input type="number" id="serviceYears" name="serviceYears" class="form-control">
+                                              </div>
+                                              <div class="form-group col">
+                                                <label for="serviceMonths">Months of Service:</label>
+                                                <input type="number" id="serviceMonths" name="serviceMonths" class="form-control">
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <button type="submit" class="btn btn-success mt-3">Save</button>
+                                    </form>
+                                  </div>
+                        <!--Career of employee ends-->
 
             <!--Documents of employee starts-->	
                       <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab"> 
@@ -347,73 +401,118 @@
           </div>
         </div>
 
-        <script>
-          document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('exampleInputFile').addEventListener('change', function() {
-              const file = this.files[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                  document.getElementById('uploadedImage').src = event.target.result;
-                }
-                reader.readAsDataURL(file);
-              }
-            });
-          });
-        </script>
-          <script>
-            document.getElementById('sameAddress').addEventListener('change', function() {
-              if (this.checked) {
-                document.getElementById('permanentAddressLine1').value = document.getElementById('currentAddressLine1').value;
-                document.getElementById('permanentStreet').value = document.getElementById('currentStreet').value;
-                document.getElementById('permanentPin').value = document.getElementById('currentPin').value;
-                document.getElementById('permanentVillage').value = document.getElementById('currentVillage').value;
-                document.getElementById('permanentCity').value = document.getElementById('currentCity').value;
-                document.getElementById('permanentState').value = document.getElementById('currentState').value;
-                document.getElementById('permanentCountry').value = document.getElementById('currentCountry').value;
-              } else {
-                document.getElementById('permanentAddressLine1').value = '';
-                document.getElementById('permanentStreet').value = '';
-                document.getElementById('permanentPin').value = '';
-                document.getElementById('permanentVillage').value = '';
-                document.getElementById('permanentCity').value = '';
-                document.getElementById('permanentState').value = '';
-                document.getElementById('permanentCountry').value = '';
-              }
-            });
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('exampleInputFile').addEventListener('change', function() {
+                  const file = this.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                      document.getElementById('uploadedImage').src = event.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                  }
+                });
+              });
+            </script>
+              <script>
+                document.getElementById('sameAddress').addEventListener('change', function() {
+                  if (this.checked) {
+                    document.getElementById('permanentAddressLine1').value = document.getElementById('currentAddressLine1').value;
+                    document.getElementById('permanentStreet').value = document.getElementById('currentStreet').value;
+                    document.getElementById('permanentPin').value = document.getElementById('currentPin').value;
+                    document.getElementById('permanentVillage').value = document.getElementById('currentVillage').value;
+                    document.getElementById('permanentCity').value = document.getElementById('currentCity').value;
+                    document.getElementById('permanentState').value = document.getElementById('currentState').value;
+                    document.getElementById('permanentCountry').value = document.getElementById('currentCountry').value;
+                  } else {
+                    document.getElementById('permanentAddressLine1').value = '';
+                    document.getElementById('permanentStreet').value = '';
+                    document.getElementById('permanentPin').value = '';
+                    document.getElementById('permanentVillage').value = '';
+                    document.getElementById('permanentCity').value = '';
+                    document.getElementById('permanentState').value = '';
+                    document.getElementById('permanentCountry').value = '';
+                  }
+                });
 
-            document.getElementById('addFamilyMember').addEventListener('click', function() {
-              var familyMembersDiv = document.getElementById('familyMembers');
-              var newMemberDiv = document.createElement('div');
-              newMemberDiv.classList.add('familyMember', 'form-row');
-              newMemberDiv.innerHTML = `
-                <div class="col">
-                  <label for="familyName">Name:</label>
-                  <input type="text" name="familyName[]" class="form-control">
-                </div>
-                <div class="col">
-                  <label for="familyBirthdate">Birthdate:</label>
-                  <input type="date" name="familyBirthdate[]" class="form-control">
-                </div>
-                <div class="col">
-                  <label for="familyRelation">Relation:</label>
-                  <input type="text" name="familyRelation[]" class="form-control">
-                </div>
+                document.getElementById('addFamilyMember').addEventListener('click', function() {
+                  var familyMembersDiv = document.getElementById('familyMembers');
+                  var newMemberDiv = document.createElement('div');
+                  newMemberDiv.classList.add('familyMember', 'form-row');
+                  newMemberDiv.innerHTML = `
+                    <div class="col">
+                      <label for="familyName">Name:</label>
+                      <input type="text" name="familyName[]" class="form-control">
+                    </div>
+                    <div class="col">
+                      <label for="familyBirthdate">Birthdate:</label>
+                      <input type="date" name="familyBirthdate[]" class="form-control">
+                    </div>
+                    <div class="col">
+                      <label for="familyRelation">Relation:</label>
+                      <input type="text" name="familyRelation[]" class="form-control">
+                    </div>
+                  `;
+                  familyMembersDiv.appendChild(newMemberDiv);
+                });
+              </script>
+            <script>
+            document.getElementById('addMoreFields').addEventListener('click', function() {
+              var additionalFieldsDiv = document.getElementById('additionalFields');
+              var newFieldDiv = document.createElement('div');
+              newFieldDiv.classList.add('form-group');
+              newFieldDiv.innerHTML = `
+                <label for="additionalField">Additional Field:</label>
+                <input type="text" name="additionalField[]" class="form-control">
               `;
-              familyMembersDiv.appendChild(newMemberDiv);
+              additionalFieldsDiv.appendChild(newFieldDiv);
             });
-          </script>
-      <script>
-        document.getElementById('addMoreFields').addEventListener('click', function() {
-          var additionalFieldsDiv = document.getElementById('additionalFields');
-          var newFieldDiv = document.createElement('div');
-          newFieldDiv.classList.add('form-group');
-          newFieldDiv.innerHTML = `
-            <label for="additionalField">Additional Field:</label>
-            <input type="text" name="additionalField[]" class="form-control">
-          `;
-          additionalFieldsDiv.appendChild(newFieldDiv);
-        });
-      </script>
+            </script>
+                <script>
+                  document.getElementById('experienced').addEventListener('change', function() {
+                    var experiencedFields = document.getElementById('experiencedFields');
+                    var addExperienceButton = document.getElementById('addExperienceFields');
+                    if (this.checked) {
+                      experiencedFields.style.display = 'block';
+                      addExperienceButton.style.display = 'block';
+                    } else {
+                      experiencedFields.style.display = 'none';
+                      addExperienceButton.style.display = 'none';
+                    }
+                  });
+
+                  document.getElementById('indianDefence').addEventListener('change', function() {
+                    var defenceFields = document.getElementById('defenceFields');
+                    var addDefenceButton = document.getElementById('addDefenceFields');
+                    if (this.checked) {
+                      defenceFields.style.display = 'block';
+                      addDefenceButton.style.display = 'block';
+                    } else {
+                      defenceFields.style.display = 'none';
+                      addDefenceButton.style.display = 'none';
+                    }
+                  });
+
+                  document.getElementById('addExperienceFields').addEventListener('click', function() {
+                    var additionalExperienceField = document.createElement('div');
+                    additionalExperienceField.classList.add('form-group');
+                    additionalExperienceField.innerHTML = `
+                      <label for="additionalExperienceField">Additional Experience Field:</label>
+                      <input type="text" name="additionalExperienceField[]" class="form-control">
+                    `;
+                    document.getElementById('experiencedFields').appendChild(additionalExperienceField);
+                  });
+
+                  document.getElementById('addDefenceFields').addEventListener('click', function() {
+                    var additionalDefenceField = document.createElement('div');
+                    additionalDefenceField.classList.add('form-group');
+                    additionalDefenceField.innerHTML = `
+                      <label for="additionalDefenceField">Additional Defence Field:</label>
+                      <input type="text" name="additionalDefenceField[]" class="form-control">
+                    `;
+                    document.getElementById('defenceFields').appendChild(additionalDefenceField);
+                  });
+                </script>
 
 {% endblock %}

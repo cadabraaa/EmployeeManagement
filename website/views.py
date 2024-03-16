@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .models import Employee, Role, Gender, Education, Marital, Family, Country, State, City
+from .models import Employee, Role, Gender, Education, Marital, Family, Country, State, City, Photo, Identification, Caddress, Paddress, Weapon, Career, Army
 from flask_cors import CORS, cross_origin
 from . import db
 import os
@@ -63,7 +63,6 @@ def generate_employee_id(company_code):
 
   return f'{company_code}{new_id_number:06d}'
 
-
 @views.route('/add_employee', methods=['GET', 'POST'])
 @login_required
 @cross_origin()
@@ -85,6 +84,34 @@ def add_employee():
         family_names = request.form.getlist('familyName[]')
         family_birthdates = request.form.getlist('familyBirthdate[]')
         family_relations = request.form.getlist('familyRelation[]')
+        pan = request.form.get('pan')
+        aadhar = request.form.get('aadhar')
+        voter = request.form.get('voter')
+        passport = request.form.get('passport')
+        dl = request.form.get('dl')
+        caddress_line1 = request.form.get('caddress_line1')
+        cstreet = request.form.get('cstreet')
+        cpin = request.form.get('cpin')
+        cvillage = request.form.get('cvillage')
+        ccity_id = request.form.get('ccity_id')
+        cstate_id = request.form.get('cstate_id')
+        ccountry_id = request.form.get('ccountry_id')
+        paddress_line1 = request.form.get('paddress_line1')
+        pstreet = request.form.get('pstreet')
+        ppin = request.form.get('ppin')
+        pvillage = request.form.get('pvillage')
+        pcity_id = request.form.get('pcity_id')
+        pstate_id = request.form.get('pstate_id')
+        pcountry_id = request.form.get('pcountry_id')
+        weapon = request.form.getlist('weapon[]')
+        license = request.form.getlist('license[]')
+        career_companies = request.form.getlist('careerCompany[]')
+        career_joiningdates = request.form.getlist('careerJoiningdate[]')
+        career_leavingdates = request.form.getlist('careerLeavingdate[]')
+        force = request.form.get('force')
+        joining = request.form.get('joining')
+        leaving = request.form.get('leaving')
+        
 
         if not first_name or not last_name or not email or not mobile:
             flash('All fields are required.', category='error')
@@ -106,7 +133,7 @@ def add_employee():
                         first_name=first_name,
                         middle_name=middle_name,
                         last_name=last_name,
-                        gender_id=gender_id,  # Assign the gender_id
+                        gender_id=gender_id,
                         email=email,
                         mobile=mobile,
                         user_id=current_user.id,
@@ -132,8 +159,75 @@ def add_employee():
                         )
                         db.session.add(new_family_member)
 
+                    # Add Carrer
+                    for company, cjoiningdate, cleavingdate in zip(career_companies, career_joiningdates, career_leavingdates):
+                        new_career = Career(
+                            employee_id=new_employee.employee_id,
+                            company=company,
+                            joiningdate=cjoiningdate,
+                            leavingdate=cleavingdate
+                        )
+                        db.session.add(new_career)
+
+                    # Add Army
+                    new_army = Army(
+                        employee_id=new_employee.employee_id,
+                        force=force,
+                        joining=joining,
+                        leaving=leaving
+                    )
+                    db.session.add(new_army)
+
+                    # Add weapon
+                    for weapon, license in zip(weapon, license):
+                        new_weapon = Weapon(
+                          employee_id=new_employee.employee_id,
+                          weapon=weapon,
+                          license=license
+                        )
+                        db.session.add(new_weapon)
+
+                    # Add identification details
+                    new_identification = Identification(
+                        pan=pan,
+                        aadhar=aadhar,
+                        voter=voter,
+                        passport=passport,
+                        dl=dl,
+                        employee_id=new_employee.employee_id
+                    )
+                    db.session.add(new_identification)
+
+                    
+                    # Add current address
+                    new_caddress = Caddress(
+                        address_line1=caddress_line1,
+                        street=cstreet,
+                        pin=cpin,
+                        village=cvillage,
+                        city_id=ccity_id,
+                        state_id=cstate_id,
+                        country_id=ccountry_id,
+                        employee_id=new_employee.employee_id
+                    )
+                    db.session.add(new_caddress)
+
+                    # Add permanent address
+                    new_paddress = Paddress(
+                        address_line1=paddress_line1,
+                        street=pstreet,
+                        pin=ppin,
+                        village=pvillage,
+                        city_id=pcity_id,
+                        state_id=pstate_id,
+                        country_id=pcountry_id,
+                        employee_id=new_employee.employee_id
+                    )
+                    db.session.add(new_paddress)
+
+                    
                     db.session.commit()
-                    flash('Employee and family details added successfully!', category='success')
+
             except Exception as e:
                 db.session.rollback()
                 flash(f'An error occurred: {str(e)}', category='error')
@@ -143,8 +237,24 @@ def add_employee():
     genders = Gender.query.all()
     educations = Education.query.all()
     maritals = Marital.query.all()
+    countries = Country.query.all()
+    states = State.query.all()
+    cities = City.query.all()
 
-    return render_template("add_employee.html", user=current_user, roles=roles, genders=genders, educations=educations, maritals=maritals)
+    return render_template(
+        "add_employee.html", 
+        user=current_user, 
+        roles=roles, 
+        genders=genders, 
+        educations=educations, 
+        maritals=maritals,
+        countries=countries,
+        states=states,
+        cities=cities
+    )
+
+
+
 
 
 
@@ -244,3 +354,4 @@ def display_employee():
     employees = Employee.query.all()
 
     return render_template('display_employee.html', employees=employees)
+
