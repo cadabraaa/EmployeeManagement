@@ -1,0 +1,549 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+    <div class="container mt-4">
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-success" role="alert">
+                      {{message}}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+
+
+      <div class="container mt-4">
+          <h1>Edit Employee</h1>
+
+        <div class="container">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <div class="profile-userpic">
+                                <img id="uploadedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" class="img-responsive" alt="" style="width: 100%;">
+                            </div>
+                            <form action="/upload" method="post" enctype="multipart/form-data">
+                                <div class="form-group mt-3">
+                                    <input type="file" class="form-control-file" id="exampleInputFile" name="file" accept="image/*"> 
+                                </div>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">Upload</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form method="POST" >
+            <div class="form-group">
+                <label for="first_name">First Name: <span style="color: red;">*</span></label>
+                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ employee.first_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="middle_name">Middle Name:</label>
+                <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{ employee.middle_name }}">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name: <span style="color: red;">*</span></label>
+                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ employee.last_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Role: <span style="color: red;">*</span></label>
+                <select class="form-control" id="role" name="role" required>
+                    {% for role in roles %}
+                        <option value="{{ role.id }}" {% if employee.role_id == role.id %} selected {% endif %}>{{ role.role }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender: <span style="color: red;">*</span></label>
+                <select class="form-control" id="gender" name="gender" required>
+                    {% for gender in genders %}
+                        <option value="{{ gender.id }}" {% if employee.gender_id == gender.id %} selected {% endif %}>{{ gender.gender }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="email">Email: <span style="color: red;">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ employee.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile: <span style="color: red;">*</span></label>
+                <input type="text" class="form-control" id="mobile" name="mobile" value="{{ employee.mobile }}" required>
+            </div>
+          
+            <div class="form-group">
+                <label for="education">Education : </label>
+                <select class="form-control" id="education" name="education" required>
+                    {% for education in educations %}
+                        <option value="{{ education.id }}" {% if employee.education_id == education.id %} selected {% endif %}>{{ education.education }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="birthdate">Birthdate: </label>
+                <input type="date" class="form-control" id="birthdate" name="birthdate" value="{{ employee.birthdate }}" required>
+            </div>
+          <div class="form-group">
+              <label for="height">Height (cm): </label>
+              <input type="number" class="form-control" id="height" name="height" value="{{ employee.height }}" required>
+          </div>
+          <div class="form-group">
+              <label for="weight">Weight (kg): </label>
+              <input type="number" class="form-control" id="weight" name="weight" value="{{ employee.weight }}" required>
+          </div>
+
+           
+
+          <!-- Family details -->
+          <div id="familyMembers">
+              {% for member in family %}
+              <div class="form-group">
+                  <div class="form-row">
+                      <div class="col">
+                          <label for="family_name_{{ member.id }}">Family Member Name:</label>
+                          <input type="text" class="form-control" id="family_name_{{ member.id }}" name="family_name_{{ member.id }}" value="{{ member.fullname }}">
+                      </div>
+                      <div class="col">
+                          <label for="family_birthdate_{{ member.id }}">Birthdate:</label>
+                          <input type="date" class="form-control" id="family_birthdate_{{ member.id }}" name="family_birthdate_{{ member.id }}" value="{{ member.birthdate }}">
+                      </div>
+                      <div class="col">
+                          <label for="family_relation_{{ member.id }}">Relation:</label>
+                          <input type="text" class="form-control" id="family_relation_{{ member.id }}" name="family_relation_{{ member.id }}" value="{{ member.relation }}">
+                      </div>
+                      <div class="col">
+                          <button type="button" class="btn btn-danger mt-4 deleteFamilyMember" data-id="{{ member.id }}">Delete</button>
+                      </div>
+                  </div>
+              </div>
+              {% endfor %}
+          </div>
+
+          <button type="button" id="addFamilyMember" class="btn btn-info mt-3">Add More Family Member</button>
+
+          <!-- Hidden input field to store deleted family member IDs -->
+          <input type="hidden" id="deleted_family_member_ids" name="deleted_family_member_ids" value="">
+
+
+            </br>
+
+            <!-- Identification details -->
+            <div class="form-group">
+                <label for="pan">PAN:</label>
+                <input type="text" id="pan" name="pan" class="form-control" value="{{ identification.pan }}">
+            </div>
+            <div class="form-group">
+                <label for="aadhar">Aadhar:</label>
+                <input type="text" id="aadhar" name="aadhar" class="form-control" value="{{ identification.aadhar }}">
+            </div>
+            <div class="form-group">
+                <label for="voter">Voter ID:</label>
+                <input type="text" id="voter" name="voter" class="form-control" value="{{ identification.voter }}">
+            </div>
+            <div class="form-group">
+                <label for="dl">Driving License:</label>
+                <input type="text" id="dl" name="dl" class="form-control" value="{{ identification.dl }}">
+            </div>
+            <div class="form-group">
+                <label for="passport">Passport:</label>
+                <input type="text" id="passport" name="passport" class="form-control" value="{{ identification.passport }}">
+            </div>
+
+          <!-- Edit Current Address -->
+          <div class="form-group">
+              <label for="caddress_line1">Address Line 1:</label>
+              <input type="text" id="caddress_line1" name="caddress_line1" class="form-control" value="{{ caddress.address_line1 }}">
+          </div>
+
+          <div class="form-group">
+              <label for="cstreet">Street:</label>
+              <input type="text" id="cstreet" name="cstreet" class="form-control" value="{{ caddress.street }}">
+          </div>
+
+          <div class="form-group">
+              <label for="cpin">PIN:</label>
+              <input type="text" id="cpin" name="cpin" class="form-control" value="{{ caddress.pin }}">
+          </div>
+
+          <div class="form-group">
+              <label for="cvillage">Village:</label>
+              <input type="text" id="cvillage" name="cvillage" class="form-control" value="{{ caddress.village }}">
+          </div>
+
+          <div class="form-group">
+              <label for="ccity_id">City:</label>
+              <select id="ccity_id" name="ccity_id" class="form-control">
+                  <option value="" disabled>Select City</option>
+                  {% for city in cities %}
+                      <option value="{{ city.id }}" {% if city.id == caddress.city_id %} selected {% endif %}>{{ city.city }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+          <div class="form-group">
+              <label for="cstate_id">State:</label>
+              <select id="cstate_id" name="cstate_id" class="form-control">
+                  <option value="" disabled>Select State</option>
+                  {% for state in states %}
+                      <option value="{{ state.id }}" {% if state.id == caddress.state_id %} selected {% endif %}>{{ state.state }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+          <div class="form-group">
+              <label for="ccountry_id">Country:</label>
+              <select id="ccountry_id" name="ccountry_id" class="form-control">
+                  <option value="" disabled>Select Country</option>
+                  {% for country in countries %}
+                      <option value="{{ country.id }}" {% if country.id == caddress.country_id %} selected {% endif %}>{{ country.country }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+          <input type="checkbox" id="sameAddress" name="sameAddress" class="form-check-input">
+          <label for="sameAddress" class="form-check-label">Same as Current Address</label><br><br>
+          <!-- Edit Permanent Address -->
+
+          <div class="form-group">
+              <label for="paddress_line1">Address Line 1:</label>
+              <input type="text" id="paddress_line1" name="paddress_line1" class="form-control" value="{{ paddress.address_line1 }}">
+          </div>
+
+          <div class="form-group">
+              <label for="pstreet">Street:</label>
+              <input type="text" id="pstreet" name="pstreet" class="form-control" value="{{ paddress.street }}">
+          </div>
+
+          <div class="form-group">
+              <label for="ppin">PIN:</label>
+              <input type="text" id="ppin" name="ppin" class="form-control" value="{{ paddress.pin }}">
+          </div>
+
+          <div class="form-group">
+              <label for="pvillage">Village:</label>
+              <input type="text" id="pvillage" name="pvillage" class="form-control" value="{{ paddress.village }}">
+          </div>
+
+          <div class="form-group">
+              <label for="pcity_id">City:</label>
+              <select id="pcity_id" name="pcity_id" class="form-control">
+                  <option value="" disabled>Select City</option>
+                  {% for city in cities %}
+                      <option value="{{ city.id }}" {% if city.id == paddress.city_id %} selected {% endif %}>{{ city.city }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+          <div class="form-group">
+              <label for="pstate_id">State:</label>
+              <select id="pstate_id" name="pstate_id" class="form-control">
+                  <option value="" disabled>Select State</option>
+                  {% for state in states %}
+                      <option value="{{ state.id }}" {% if state.id == paddress.state_id %} selected {% endif %}>{{ state.state }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+          <div class="form-group">
+              <label for="pcountry_id">Country:</label>
+              <select id="pcountry_id" name="pcountry_id" class="form-control">
+                  <option value="" disabled>Select Country</option>
+                  {% for country in countries %}
+                      <option value="{{ country.id }}" {% if country.id == paddress.country_id %} selected {% endif %}>{{ country.country }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          
+          <!-- Weapon details -->
+          {% for weapon in weapons %}
+          <div class="row weapon-row" data-id="{{ weapon.id }}">
+              <div class="col-md-6">
+                  <label for="weapon_{{ weapon.id }}" class="form-label">Weapon:</label>
+                  <input type="text" class="form-control weapon-input" id="weapon_{{ weapon.id }}" name="weapon_{{ weapon.id }}" value="{{ weapon.weapon }}">
+              </div>
+              <div class="col-md-4">
+                  <label for="license_{{ weapon.id }}" class="form-label">License:</label>
+                  <input type="text" class="form-control license-input" id="license_{{ weapon.id }}" name="license_{{ weapon.id }}" value="{{ weapon.license }}">
+              </div>
+              <div class="col-md-2">
+                  <button type="button" class="btn btn-danger delete-weapon" data-id="{{ weapon.id }}">Delete</button>
+              </div>
+          </div>
+          {% endfor %}
+         
+          <button type="button" id="addWeapon" class="btn btn-info mt-3">Add More</button>
+
+
+          <!-- Career details -->
+          {% for career in careers %}
+          <div class="row career-row" data-id="{{ career.id }}">
+              <div class="col-md-4">
+                  <label for="career_company_{{ career.id }}" class="form-label">Company:</label>
+                  <input type="text" class="form-control career-company" id="career_company_{{ career.id }}" name="career_company_{{ career.id }}" value="{{ career.company }}">
+              </div>
+              <div class="col-md-4">
+                  <label for="career_joiningdate_{{ career.id }}" class="form-label">Joining Date:</label>
+                  <input type="date" class="form-control career-joiningdate" id="career_joiningdate_{{ career.id }}" name="career_joiningdate_{{ career.id }}" value="{{ career.joiningdate }}">
+              </div>
+              <div class="col-md-4">
+                  <label for="career_leavingdate_{{ career.id }}" class="form-label">Leaving Date:</label>
+                  <input type="date" class="form-control career-leavingdate" id="career_leavingdate_{{ career.id }}" name="career_leavingdate_{{ career.id }}" value="{{ career.leavingdate }}">
+              </div>
+              <div class="col-md-2">
+                  <button type="button" class="btn btn-danger delete-career" data-id="{{ career.id }}">Delete</button>
+              </div>
+          </div>
+          {% endfor %}
+          <button type="button" id="addCareerField" class="btn btn-info mt-3">Add More</button>
+          <input type="hidden" id="deleted_career_ids" name="deleted_career_ids" value="">
+
+        
+          </br>
+
+      <!-- Indian Army fields -->
+      <div id="army">
+          <div class="form-group">
+              <label for="force">Name of Force:</label>
+              <input type="text" name="force" class="form-control" value="{{ army.force }}">
+          </div>
+          <div class="form-row">
+              <div class="form-group col">
+                  <label for="joining">Joining Date:</label>
+                  <input type="date" name="joining" class="form-control" value="{{ army.joining }}">
+              </div>
+              <div class="form-group col">
+                  <label for="leaving">Leaving Date:</label>
+                  <input type="date" name="leaving" class="form-control" value="{{ army.leaving }}">
+              </div>
+          </div>
+      </div>
+          
+            </br>
+
+          <!-- Submit Button -->
+              <button type="submit" class="btn btn-primary">Submit</button>
+          </br>
+
+        </form>
+
+
+
+        <script>
+           document.addEventListener('DOMContentLoaded', function() {
+             document.getElementById('exampleInputFile').addEventListener('change', function() {
+               const file = this.files[0];
+               if (file) {
+                 const reader = new FileReader();
+                 reader.onload = function(event) {
+                   document.getElementById('uploadedImage').src = event.target.result;
+                 }
+                 reader.readAsDataURL(file);
+               }
+             });
+           });
+         </script>
+        <script>
+            document.getElementById('sameAddress').addEventListener('change', function() {
+                if (this.checked) {
+                    // Set permanent address fields to current address values
+                    document.getElementById('paddress_line1').value = document.getElementById('caddress_line1').value;
+                    document.getElementById('pstreet').value = document.getElementById('cstreet').value;
+                    document.getElementById('ppin').value = document.getElementById('cpin').value;
+                    document.getElementById('pvillage').value = document.getElementById('cvillage').value;
+                    document.getElementById('pcity_id').value = document.getElementById('ccity_id').value;
+                    document.getElementById('pstate_id').value = document.getElementById('cstate_id').value;
+                    document.getElementById('pcountry_id').value = document.getElementById('ccountry_id').value;
+                } else {
+                    // Clear permanent address fields
+                    document.getElementById('paddress_line1').value = '';
+                    document.getElementById('pstreet').value = '';
+                    document.getElementById('ppin').value = '';
+                    document.getElementById('pvillage').value = '';
+                    document.getElementById('pcity_id').value = '';
+                    document.getElementById('pstate_id').value = '';
+                    document.getElementById('pcountry_id').value = '';
+                }
+            });
+        </script>
+        <script>
+           document.addEventListener("DOMContentLoaded", function() {
+               function deleteFamilyMember(event) {
+                   var memberId = event.target.dataset.id;
+                   var memberElement = event.target.closest(".form-group");
+                   memberElement.parentNode.removeChild(memberElement);
+                   var deletedMemberIdsInput = document.getElementById("deleted_family_member_ids");
+                   deletedMemberIdsInput.value += memberId + ",";
+               }
+
+               document.querySelectorAll(".deleteFamilyMember").forEach(function(button) {
+                   button.addEventListener("click", deleteFamilyMember);
+               });
+
+               function addFamilyMember() {
+                   var familyMembersContainer = document.getElementById("familyMembers");
+                   var timestamp = Date.now();
+                   
+                   familyMembersContainer.insertAdjacentHTML('beforeend', newFamilyMember);
+                   document.querySelectorAll(".deleteFamilyMember").forEach(function(button) {
+                       button.addEventListener("click", deleteFamilyMember);
+                   });
+               }
+
+               document.getElementById("addFamilyMember").addEventListener("click", addFamilyMember);
+           });
+           </script>
+         <script>
+             document.getElementById('addFamilyMember').addEventListener('click', function() {
+                 var familyMembersDiv = document.getElementById('familyMembers');
+                 var newMemberDiv = document.createElement('div');
+                 newMemberDiv.classList.add('familyMember', 'form-row');
+                 newMemberDiv.innerHTML = `
+                     <div class="col">
+                         <label for="familyName">Name:</label>
+                         <input type="text" name="familyName[]" class="form-control">
+                     </div>
+                     <div class="col">
+                         <label for="familyBirthdate">Birthdate:</label>
+                         <input type="date" name="familyBirthdate[]" class="form-control">
+                     </div>
+                     <div class="col">
+                         <label for="familyRelation">Relation:</label>
+                         <input type="text" name="familyRelation[]" class="form-control">
+                     </div>
+                     <div class="col">
+                         <button type="button" class="btn btn-danger mt-2 deleteFamilyMember">Delete</button>
+                     </div>
+                 `;
+                 familyMembersDiv.appendChild(newMemberDiv);
+
+                 // Add event listener to the delete button of the new member
+                 newMemberDiv.querySelector('.deleteFamilyMember').addEventListener('click', function() {
+                     familyMembersDiv.removeChild(newMemberDiv);
+                 });
+             });
+         </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Function to handle deleting weapon
+                function deleteWeapon(event) {
+                    var weaponId = event.target.dataset.id;
+                    var weaponRow = event.target.closest(".weapon-row");
+                    weaponRow.parentNode.removeChild(weaponRow);
+                    var deletedWeaponIdsInput = document.getElementById("deleted_weapon_ids");
+                    deletedWeaponIdsInput.value += weaponId + ",";
+                }
+
+                // Add event listener to all delete weapon buttons
+                document.querySelectorAll(".delete-weapon").forEach(function(button) {
+                    button.addEventListener("click", deleteWeapon);
+                });
+
+                // Function to handle adding new weapon
+                function addWeapon() {
+                    var weaponsContainer = document.getElementById("weaponsContainer");
+                    var timestamp = Date.now();
+                    var newWeaponRow = document.createElement('div');
+                    newWeaponRow.classList.add('row', 'weapon-row');
+                    newWeaponRow.dataset.id = timestamp;
+                    newWeaponRow.innerHTML = `
+                        <div class="col-md-6">
+                            <label for="weapon_${timestamp}" class="form-label">Weapon:</label>
+                            <input type="text" class="form-control weapon-input" id="weapon_${timestamp}" name="new_weapon[]" value="">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="license_${timestamp}" class="form-label">License:</label>
+                            <input type="text" class="form-control license-input" id="license_${timestamp}" name="new_license[]" value="">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger delete-weapon" data-id="${timestamp}">Delete</button>
+                        </div>
+                    `;
+                    weaponsContainer.appendChild(newWeaponRow);
+
+                    // Add event listener to the delete button of the new weapon
+                    newWeaponRow.querySelector('.delete-weapon').addEventListener('click', deleteWeapon);
+                }
+
+                // Add event listener to the add weapon button
+                document.getElementById("addWeapon").addEventListener("click", addWeapon);
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Function to handle deleting career
+                function deleteCareer(event) {
+                    var careerId = event.target.dataset.id;
+                    var careerRow = event.target.closest(".career-row");
+                    careerRow.parentNode.removeChild(careerRow);
+                    var deletedCareerIdsInput = document.getElementById("deleted_career_ids");
+                    deletedCareerIdsInput.value += careerId + ",";
+                }
+
+                // Add event listener to all delete career buttons
+                document.querySelectorAll(".delete-career").forEach(function(button) {
+                    button.addEventListener("click", deleteCareer);
+                });
+
+                // Function to handle adding new career
+                function addCareer() {
+                    var careersContainer = document.getElementById("careersContainer");
+                    var timestamp = Date.now();
+                    var newCareerRow = document.createElement('div');
+                    newCareerRow.classList.add('row', 'career-row');
+                    newCareerRow.dataset.id = timestamp;
+                    newCareerRow.innerHTML = `
+                        <div class="col-md-4">
+                            <label for="career_company_${timestamp}" class="form-label">Company:</label>
+                            <input type="text" class="form-control career-company" id="career_company_${timestamp}" name="new_career_company[]" value="">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="career_joiningdate_${timestamp}" class="form-label">Joining Date:</label>
+                            <input type="date" class="form-control career-joiningdate" id="career_joiningdate_${timestamp}" name="new_career_joiningdate[]" value="">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="career_leavingdate_${timestamp}" class="form-label">Leaving Date:</label>
+                            <input type="date" class="form-control career-leavingdate" id="career_leavingdate_${timestamp}" name="new_career_leavingdate[]" value="">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger delete-career" data-id="${timestamp}">Delete</button>
+                        </div>
+                    `;
+                    careersContainer.appendChild(newCareerRow);
+
+                    // Add event listener to the delete button of the new career
+                    newCareerRow.querySelector('.delete-career').addEventListener('click', deleteCareer);
+                }
+
+                // Add event listener to the add career button
+                document.getElementById("addCareer").addEventListener("click", addCareer);
+            });
+        </script>
+        <script>
+            document.getElementById('addCareerField').addEventListener('click', function() {
+                var careerFieldsDiv = document.getElementById('careerFields');
+                var newCareerFieldDiv = document.createElement('div');
+                newCareerFieldDiv.classList.add('career-field', 'form-group');
+                newCareerFieldDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="companyName">Company Name:</label>
+                        <input type="text" name="careerCompany[]" class="form-control">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="careerJoiningdate">Joining Date:</label>
+                            <input type="date" name="careerJoiningdate[]" class="form-control">
+                        </div>
+                        <div class="form-group col">
+                            <label for="careerLeavingdate">Leaving Date:</label>
+                            <input type="date" name="careerLeavingdate[]" class="form-control">
+                        </div>
+                    </div>
+                `;
+                careerFieldsDiv.appendChild(newCareerFieldDiv);
+            });
+        </script>
+
+{% endblock %}

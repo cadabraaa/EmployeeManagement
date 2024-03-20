@@ -31,13 +31,13 @@ class Employee(db.Model):
     education_id = db.Column(db.Integer, db.ForeignKey('education.id'))
     marital_id = db.Column(db.Integer, db.ForeignKey('marital.id'))
     families = db.relationship('Family', backref='employee', lazy=True)
-    photos = db.relationship('Photo', backref='employee', lazy=True)
     Identification = db.relationship('Identification', backref='employee', lazy=True)
     caddress = db.relationship('Caddress', backref='employee', uselist=False)
     paddress = db.relationship('Paddress', backref='employee', uselist=False)
     weapons = db.relationship('Weapon', backref='employee', lazy=True)
     careers = db.relationship('Career', backref='employee', lazy=True)
     army = db.relationship('Army', backref='employee', lazy=True)
+    photo = db.relationship('Photo', backref='employee', lazy=True)
     
 
 
@@ -64,13 +64,6 @@ class Marital(db.Model, UserMixin):
   marital = db.Column(db.String(50), unique=True)
   employees = db.relationship('Employee', backref='marital', lazy=True)
 
-class Family(db.Model, UserMixin):
-  id = db.Column(db.Integer, primary_key=True)
-  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
-  fullname = db.Column(db.String(150))
-  relation = db.Column(db.String(50))
-  birthdate = db.Column(db.Date)
-
 class Photo(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   path = db.Column(db.String(255), unique=True)
@@ -84,7 +77,14 @@ class Identification(db.Model, UserMixin):
   dl = db.Column(db.String(255))
   passport = db.Column(db.String(255))
   employee_id = db.Column(db.String(50), db.ForeignKey('employee.employee_id'))
-
+  
+class Family(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+  fullname = db.Column(db.String(150))
+  relation = db.Column(db.String(50))
+  birthdate = db.Column(db.Date)
+  
 class Weapon(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))

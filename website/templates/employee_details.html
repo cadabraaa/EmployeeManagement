@@ -11,220 +11,239 @@
           {% endif %}
       {% endwith %}
       <h1>Employee Details</h1>
-    </br>
+      </br>
       <div class="container">
-        <div class="row">
-          <div class="col-12">
+          <div class="row">
+              <div class="col-12">
 
-            <!-- User profile -->
-              <div class="card mb-3">
-                <div class="card-header">
-                  <h4 class="card-title">Basic Information</h4>
-                </div>
-                <div class="card-body">
-                  <div class="row align-items-center">
+                  <!-- User profile -->
+                  <div class="card mb-3">
+                      <div class="card-header">
+                          <h4 class="card-title">Basic Information</h4>
+                      </div>
+                      <div class="card-body">
+                          <div class="row align-items-center">
 
-                    <!-- Profile Picture -->
-                    <div class="col-md-4 d-flex justify-content-center">
-                          <img id="selectedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" alt="example placeholder" style="width: 300px;" />
+                              <!-- Profile Picture -->
+                              <div class="col-md-4 d-flex justify-content-center">
+                                  <img id="selectedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" alt="example placeholder" style="width: 300px;" />
+                              </div>
+
+                              <div class="d-flex justify-content-center">
+                                  <!-- Display the uploaded photo dynamically -->
+                                  {% if file_path %}
+                                      <img id="uploadedPhoto" src="{{ url_for('media', filename=file_path) }}" alt="Uploaded Photo" style="width: 300px;">
+                                  {% endif %}
+                              </div>
+
+                              <!-- Non-editable user information -->
+                              <div class="col-md-8">
+                                  <div class="user-info" style="font-size: larger;">
+                                      <p><strong>Employee ID :</strong> {{ employee.employee_id }}</p>
+                                      <p><strong>Full Name :</strong> {{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</p>
+                                      <p><strong>Role :</strong> {{ employee.role.role }}</p>
+                                      <p><strong>Gender :</strong> {{ employee.gender.gender}}</p>
+                                      <p><strong>Email :</strong> {{ employee.email }}</p>
+                                      <p><strong>Mobile :</strong> {{ employee.mobile }}</p>
+                                  </div>
+                              </div>
+
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- User info -->
+                  <div class="card mb-3">
+                      <div class="card-header">
+                          <h4 class="card-title">More information</h4>
+                      </div>
+                      <table class="table profile__table">
+                          <tbody>
+                              <tr>
+                                  <th><strong>Birthdate</strong></th>
+                                  <td>{{ employee.birthdate if employee.birthdate else "Pending" }}</td>
+                              </tr>
+                              <tr>
+                                  <th><strong>Height (cm)</strong></th>
+                                  <td>{{ employee.height if employee.height else "Pending" }}</td>
+                              </tr>
+                              <tr>
+                                  <th><strong>Weight (kg)</strong></th>
+                                  <td>{{ employee.weight if employee.weight else "Pending" }}</td>
+                              </tr>
+                              <tr>
+                                  <th><strong>Marital Status</strong></th>
+                                  <td>{{ employee.marital.marital if employee.marital else "Pending" }}</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+
+                  <!-- Education -->
+                  <div class="card mb-3">
+                      <div class="card-header">
+                          <h4 class="card-title">Identificaion Numbers</h4>
+                      </div>
+                      <table class="table profile__table">
+                          <tbody>
+                              <tr>
+                                  <th><strong>Aadhar Number</strong></th>
+                                  <td>{{ identification.aadhar if identification.aadhar else "Pending" }}</td>
+                              </tr>
+                              <tr>
+                                  <th><strong>PAN</strong></th>
+                                  <td>{{ identification.pan if identification.pan else "Pending" }}</td>
+                              </tr>
+                              <tr>
+                                  <th><strong>Voter ID</strong></th>
+                                  <td>{{ identification.voter if identification.voter else "Pending" }}</td>
+                              </tr>
+                              <tr>
+                                  <th><strong>Driving License</strong></th>
+                                  <td>{{ identification.dl if identification.dl else "Pending" }}</td>
+                              </tr>
+                              <tr>
+                                  <th><strong>Passport Number</strong></th>
+                                  <td>{{ identification.passport if identification.passport else "Pending" }}</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+
+                  <!-- Family -->
+                  <div class="card mb-3">
+                      <div class="card-header">
+                          <h4 class="card-title">Family</h4>
+                      </div>
+                      <table class="table">
+                          <thead>
+                              <tr>
+                                  <th scope="col">Name</th>
+                                  <th scope="col">Relation</th>
+                                  <th scope="col">Birthdate</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for member in family %}
+                              <tr>
+                                  <td>{{ member.fullname if member.fullname else 'Pending' }}</td>
+                                  <td>{{ member.relation if member.relation else 'Pending' }}</td>
+                                  <td>{{ member.birthdate if member.birthdate else 'Pending' }}</td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+
+                  <!-- Address -->
+                  <div class="card mb-3">
+                      <div class="card-header">
+                          <h4 class="card-title">Address</h4>
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <ul class="list-group">
+                                      <li class="list-group-item list-group-item-dark">
+                                          <strong>Current Address</strong>
+                                      </li>
+                                      <li class="list-group-item">Address : {{ caddress.address_line1 if caddress.address_line1 else "Pending" }}</li>
+                                      <li class="list-group-item">{{ caddress.street if caddress.street else "Pending" }}</li>
+                                      <li class="list-group-item">{{ caddress.village if caddress.village else "Pending" }}</li>
+                                      <li class="list-group-item">{{ caddress.pin if caddress.pin else "Pending" }}</li>
+                                      <li class="list-group-item">{{ caddress.city.city if caddress.city else "Pending" }}</li>
+                                      <li class="list-group-item">{{ caddress.state.state if caddress.state else "Pending" }}</li>
+                                      <li class="list-group-item">{{ caddress.country.country if caddress.country else "Pending" }}</li>
+                                  </ul>
+                              </div>
+                              <div class="col-md-6">
+                                  <ul class="list-group">
+                                      <li class="list-group-item list-group-item-dark">
+                                          <strong>Permanent Address</strong>
+                                      </li>
+                                      <li class="list-group-item">Address : {{ paddress.address_line1 if paddress.address_line1 else "Pending" }}</li>
+                                      <li class="list-group-item">{{ paddress.street if paddress.street else "Pending" }}</li>
+                                      <li class="list-group-item">{{ paddress.village if paddress.village else "Pending" }}</li>
+                                      <li class="list-group-item">{{ paddress.pin if paddress.pin else "Pending" }}</li>
+                                      <li class="list-group-item">{{ paddress.city.city if paddress.city else "Pending" }}</li>
+                                      <li class="list-group-item">{{ paddress.state.state if paddress.state else "Pending" }}</li>
+                                      <li class="list-group-item">{{ paddress.country.country if paddress.country else "Pending" }}</li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                <!-- Education -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4 class="card-title">Education</h4>
                     </div>
-
-          <div class="d-flex justify-content-center"></div>
-
-                    <!-- Non-editable user information -->
-          <div class="col-md-8">
-            <div class="user-info" style="font-size: larger;">
-            <p><strong>Employee ID :</strong> {{ employee.employee_id }}</p>
-            <p><strong>Full Name :</strong> {{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</p>
-            <p><strong>Role :</strong> {{ employee.role.role }}</p>
-            <p><strong>Gender :</strong> {{ employee.gender.gender}}e</p>
-            <p><strong>Email :</strong> {{ employee.email }}</p>
-            <p><strong>Mobile :</strong> {{ employee.mobile }}</p>
-            </div>
-          </div>
-
-                  </div>
+                    <table class="table profile__table">
+                        <tbody>
+                            <tr>
+                                <th><strong>Highest Qualification</strong></th>
+                                <td>{{ employee.education.education if employee.education else "Pending" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-              </div>
 
-            <!-- User info -->
-            <div class="card mb-3">
-              <div class="card-header">
-                <h4 class="card-title">More information</h4>
-              </div>
-                <table class="table profile__table">
-                  <tbody>
-                    <tr>
-                      <th><strong>Birthdate</strong></th>
-                      <td>{{ employee.birthdate }}</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Height (cm)</strong></th>
-                      <td>{{ employee.height }}</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Weight (kg)</strong></th>
-                      <td>{{ employee.weight }}</td>
-                    </tr>
-                    <tr>
-                      <th><strong>Marital Status</strong></th>
-                      <td>{{ employee.marital.marital}}</td>
-                    </tr>
-                  </tbody>
-                </table>
-             </div>
-            <!-- Education -->
-            <div class="card mb-3">
-              <div class="card-header">
-                <h4 class="card-title">Identificaion Numbers</h4>
-              </div>
-                <table class="table profile__table">
-                  <tbody>
-                      <tr>
-                          <th><strong>Aadhar Number</strong></th>
-                          <td>{{ identification.aadhar }}</td>
-                      </tr>
-                      <tr>
-                          <th><strong>PAN</strong></th>
-                          <td>{{ identification.pan }}</td>
-                      </tr>
-                      <tr>
-                          <th><strong>Voter ID</strong></th>
-                          <td>{{ identification.voter }}</td>
-                      </tr>
-                      <tr>
-                          <th><strong>Driving License</strong></th>
-                          <td>{{ identification.dl }}</td>
-                      </tr>
-                      <tr>
-                          <th><strong>Passport Number</strong></th>
-                          <td>{{ identification.passport }}</td>
-                      </tr>
-                  </tbody>
-                </table>
-            </div>
-            <!-- Family -->
-            <div class="card mb-3">
-            <div class="card-header">
-              <h4 class="card-title">Family</h4>
-              </div>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Relation</th>
-                    <th scope="col">Birthdate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for member in family %}
-                  <tr>
-                    <td>{{ member.fullname }}</td>
-                    <td>{{ member.relation }}</td>
-                    <td>{{ member.birthdate }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-            <!-- Address -->
-            <div class="card mb-3">
-              <div class="card-header">
-                <h4 class="card-title">Address</h4>
-                <div class="row">
-                  <div class="col-md-6">
-                    <ul class="list-group">
-                      <li class="list-group-item list-group-item-dark">
-                        <strong>Current Address</strong>
-                      </li>
-                      <li class="list-group-item">Address : {{ caddress.address_line1 }}</li>
-                      <li class="list-group-item">{{ caddress.street }}</li>
-                      <li class="list-group-item">{{ caddress.village }}</li>
-                      <li class="list-group-item">{{ caddress.pin }}</li>
-                      <li class="list-group-item">{{ caddress.city.city }}</li>
-                      <li class="list-group-item">{{ caddress.state.state }}</li>
-                      <li class="list-group-item">{{ caddress.country.country }}</li>
-                    </ul>
-                  </div>
-                  <div class="col-md-6">
-                    <ul class="list-group">
-                      <li class="list-group-item list-group-item-dark">
-                        <strong>Permanent Address</strong>
-                      </li>
-                      <li class="list-group-item">Address : {{ paddress.address_line1 }}</li>
-                      <li class="list-group-item">{{ paddress.street }}</li>
-                      <li class="list-group-item">{{ paddress.village }}</li>
-                      <li class="list-group-item">{{ paddress.pin }}</li>
-                      <li class="list-group-item">{{ paddress.city.city }}</li>
-                      <li class="list-group-item">{{ paddress.state.state }}</li>
-                      <li class="list-group-item">{{ paddress.country.country }}</li>
-                    </ul>
-                  </div>
+                <!-- Weapon -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4 class="card-title">Weapon</h4>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Weapon Type</th>
+                                <th scope="col">License Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if not weapons %}
+                            <tr>
+                                <td colspan="2">Pending</td>
+                            </tr>
+                            {% else %}
+                            {% for weapon in weapons %}
+                            <tr>
+                                <td>{{ weapon.weapon }}</td>
+                                <td>{{ weapon.license }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
                 </div>
-              </div>
-            </div>
-            <!-- Education -->
-            <div class="card mb-3">
-              <div class="card-header">
-                <h4 class="card-title">Education</h4>
-              </div>
-                <table class="table profile__table">
-                  <tbody>
-                    <tr>
-                      <th><strong>Highest Qualification</strong></th>
-                      <td>{{employee.education.education}}</td>
-                    </tr>
-                  </tbody>
-                </table>
-            </div>
-            <!-- Weapon -->
-            <div class="card mb-3">
-            <div class="card-header">
-              <h4 class="card-title">Weapon</h4>
-              </div>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Weapon Type</th>
-                    <th scope="col">License Number</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for weapon in weapons %}
-                  <tr>
-                    <td>{{ weapon.weapon }}</td>
-                    <td>{{ weapon.license }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-            <!-- Experience -->
-            <div class="card mb-3">
-              <div class="card-header">
-                <h4 class="card-title">Experience</h4>
-              </div>
-                <section class="py-5">
-                  {% for career in careers %}
-                  <ul class="timeline">
-                    <li class="timeline-item mb-5">
-                      <h5 class="fw-bold">Company Name : {{career.company}}</h5>
-                      <p class="text-muted mb-2 fw-bold">Joining Date : {{ career.joiningdate }}</p>
-                      <p class="text-muted mb-2 fw-bold">Joining Date : {{ career.leavingdate }}</p>
-                    </li>
-                  </ul>
-                  {% endfor %}
-                  {% for army in army %}
-                    <ul class="timeline">
-                      <li class="timeline-item mb-5">
-                        <h5 class="fw-bold">Indian Defence Force : {{ army.force }}</h5>
-                        <p class="text-muted mb-2 fw-bold"> Joining Date : {{ army.joining }}</p>
-                        <p class="text-muted mb-2 fw-bold">Leaving Date : {{ army.leaving }}</p>
-                      </li>
-                    </ul>
-                  {% endfor %}
-                </section>
-            </div>
+
+                <!-- Experience -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4 class="card-title">Experience</h4>
+                    </div>
+                    <section class="py-5">
+                        {% if not careers and not army %}
+                        <p>Pending</p>
+                        {% endif %}
+                        {% for career in careers %}
+                        <ul class="timeline">
+                            <li class="timeline-item mb-5">
+                                <h5 class="fw-bold">Company Name : {{ career.company }}</h5>
+                                <p class="text-muted mb-2 fw-bold">Joining Date : {{ career.joiningdate }}</p>
+                                <p class="text-muted mb-2 fw-bold">Leaving Date : {{ career.leavingdate }}</p>
+                            </li>
+                        </ul>
+                        {% endfor %}
+                        {% for army in army %}
+                        <ul class="timeline">
+                            <li class="timeline-item mb-5">
+                                <h5 class="fw-bold">Indian Defence Force : {{ army.force }}</h5>
+                                <p class="text-muted mb-2 fw-bold"> Joining Date : {{ army.joining }}</p>
+                                <p class="text-muted mb-2 fw-bold">Leaving Date : {{ army.leaving }}</p>
+                            </li>
+                        </ul>
+                        {% endfor %}
+                    </section>
+                </div>
 
 
           </div>

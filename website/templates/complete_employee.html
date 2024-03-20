@@ -14,24 +14,7 @@
 
       <div class="container mt-4">
           <h1>Add Employee</h1>
-        <div class="container">
-          <div class="col-md-4">
-              <div class="card">
-                <div class="card-body">
-                  <div class="text-center">
-                    <div class="profile-userpic">
-                      <img id="uploadedImage" src="{{url_for('static', filename='placeholder.jpg')}}" class="img-responsive" alt="" style="width: 100%;">
-                    </div>
-                    <div class="form-group mt-3">
-                      <input type="file" class="form-control-file" id="exampleInputFile">
-                    </div>
-                    <div class="input-group-append">
-                      <button class="btn btn-primary" type="submit">Upload</button>
-                    </div>
-                  </div>
-                </div>
-            </div>
-          </div>
+
 
         <form method="POST" action="{{ url_for('views.add_employee') }}">
 
@@ -85,8 +68,8 @@
             <label for="education">Education Qualifications:</label>
             <select class="form-control" id="education_id" name="education_id">
               <option value="" disabled selected>Select Your Highest Qualification</option>
-              {% for education_option in educations %}
-              <option value="{{ education_option.id }}">{{ education_option.education }}</option>
+              {% for education in educations %}
+              <option value="{{ education.id }}">{{ education.education }}</option>
               {% endfor %}
             </select>
           </div>
@@ -167,21 +150,29 @@
 
           </br>
 
-            <div id="weapon">
-              <div class="weapon">
-                  <div class="form-row">
-                      <div class="col">
-                          <label for="weapon">Weapon Type:</label>
-                          <input type="text" name="weapon[]" class="form-control" value="">
-                      </div>
-                      <div class="col">
-                          <label for="license">License Number:</label>
-                          <input type="text" name="license[]" class="form-control" value="">
-                      </div>
-                  </div>
-              </div>
+            {% for weapon in weapons %}
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col">
+                        <label for="weapon_{{ loop.index }}">Weapon Type:</label>
+                        <input type="text" id="weapon_{{ loop.index }}" name="weapon[]" class="form-control" value="{{ weapon.weapon }}">
+                    </div>
+                    <div class="col">
+                        <label for="license_{{ loop.index }}">License Number:</label>
+                        <input type="text" id="license_{{ loop.index }}" name="license[]" class="form-control" value="{{ weapon.license }}">
+                    </div>
+                </div>
             </div>
-            <button type="button" id="addWeapon" class="btn btn-info mt-3">Add More</button>
+            {% endfor %}
+
+            <!-- New weapons will be appended here -->
+            <div id="newWeapons"></div>
+
+            <button type="button" id="addWeapons" class="btn btn-info mt-3">Add More</button>
+            </br>
+            </br>
+
+
 
 
             <div class="form-group">
@@ -292,30 +283,30 @@
             <br>
 
             <!-- Career fields -->
-            <div id="careerFields">
-                <div class="career-field">
-                    <div class="form-group">
-                        <label for="companyName">Company Name:</label>
-                        <input type="text" name="careerCompany[]" class="form-control">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col">
-                            <label for="careerJoiningdate">Join Date:</label>
-                            <input type="date" name="careerJoiningdate[]" class="form-control">
-                        </div>
-                        <div class="form-group col">
-                            <label for="careerLeavingdate">Leaving Date:</label>
-                            <input type="date" name="careerLeavingdate[]" class="form-control">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button type="button" id="addCareerField" class="btn btn-info mt-3">Add More</button>
-            
+              <div id="careerFields">
+                  <div class="career-field">
+                      <div class="form-group">
+                          <label for="companyName">Company Name:</label>
+                          <input type="text" name="careerCompany[]" class="form-control">
+                      </div>
+                      <div class="form-row">
+                          <div class="form-group col">
+                              <label for="careerJoiningdate">Joining Date:</label>
+                              <input type="date" name="careerJoiningdate[]" class="form-control">
+                          </div>
+                          <div class="form-group col">
+                              <label for="careerLeavingdate">Leaving Date:</label>
+                              <input type="date" name="careerLeavingdate[]" class="form-control">
+                          </div>
+                      </div>
+                  </div>
+              </div>
             </br>  
+              <button type="button" id="addCareerField" class="btn btn-info mt-3">Add More</button>
             </br> 
-        
+
+
+            <!-- Indian Army fields -->
             <div id="army">
                 <div class="form-group">
                     <label for="force">Name of Force:</label>
@@ -341,43 +332,53 @@
         </br>
 
 
+          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
           <script>
-             document.addEventListener('DOMContentLoaded', function() {
-               document.getElementById('exampleInputFile').addEventListener('change', function() {
-                 const file = this.files[0];
-                 if (file) {
-                   const reader = new FileReader();
-                   reader.onload = function(event) {
-                     document.getElementById('uploadedImage').src = event.target.result;
-                   }
-                   reader.readAsDataURL(file);
-                 }
-               });
-             });
-           </script>
-          <script>
+            $(document).ready(function() {
+              $('#uploadForm').submit(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
 
-            document.getElementById('addFamilyMember').addEventListener('click', function() {
-              var familyMembersDiv = document.getElementById('familyMembers');
-              var newMemberDiv = document.createElement('div');
-              newMemberDiv.classList.add('familyMember', 'form-row');
-              newMemberDiv.innerHTML = `
-                <div class="col">
-                  <label for="familyName">Name:</label>
-                  <input type="text" name="familyName[]" class="form-control">
-                </div>
-                <div class="col">
-                  <label for="familyBirthdate">Birthdate:</label>
-                  <input type="date" name="familyBirthdate[]" class="form-control">
-                </div>
-                <div class="col">
-                  <label for="familyRelation">Relation:</label>
-                  <input type="text" name="familyRelation[]" class="form-control">
-                </div>
-              `;
-              familyMembersDiv.appendChild(newMemberDiv);
+                $.ajax({
+                  url: '/upload_photo',
+                  type: 'POST',
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success: function(response) {
+                    console.log(response);
+                    // If you want to display the uploaded image immediately, you can update the src attribute of the image tag
+                    $('#uploadedImage').attr('src', response);
+                  },
+                  error: function(xhr, status, error) {
+                    console.error(error);
+                  }
+                });
+              });
             });
           </script>
+          <script>
+              document.getElementById('addweapons').addEventListener('click', function() {
+                  var weaponForm = document.getElementById('weapons');
+                  var newWeaponDiv = document.createElement('div');
+                  newWeaponDiv.classList.add('weapon');
+                  newWeaponDiv.innerHTML = `
+                      <div class="form-row">
+                          <div class="col">
+                              <label for="weapons">Weapon Type:</label>
+                              <input type="text" name="weapon[]" class="form-control">
+                          </div>
+                          <div class="col">
+                              <label for="license">License Number:</label>
+                              <input type="text" name="license[]" class="form-control">
+                          </div>
+                      </div>
+                  `;
+                  weaponForm.appendChild(newWeaponDiv);
+              });
+          </script>
+
+
           <script>
               document.getElementById('sameAddress').addEventListener('change', function() {
                   if (this.checked) {
@@ -401,48 +402,35 @@
                   }
               });
           </script>
-          <script>
-              document.getElementById('addWeapon').addEventListener('click', function() {
-                  var weaponDiv = document.getElementById('weapon');
-                  var newWeaponDiv = document.createElement('div');
-                  newWeaponDiv.classList.add('weapon', 'form-row');
-                  newWeaponDiv.innerHTML = `
-                      <div class="col">
-                          <label for="weapon">Weapon Type:</label>
-                          <input type="text" name="weapon[]" class="form-control">
-                      </div>
-                      <div class="col">
-                          <label for="license">License Number:</label>
-                          <input type="text" name="license[]" class="form-control">
-                      </div>
-                  `;
-                  weaponDiv.appendChild(newWeaponDiv);
-              });
-          </script>
-          <script>
-              document.getElementById('addCareerField').addEventListener('click', function() {
-                  var careerFieldsDiv = document.getElementById('careerFields');
-                  var newCareerFieldDiv = document.createElement('div');
-                  newCareerFieldDiv.classList.add('career-field', 'form-group');
-                  newCareerFieldDiv.innerHTML = `
-                      <div class="form-group">
-                          <label for="companyName">Company Name:</label>
-                          <input type="text" name="careerCompany[]" class="form-control">
-                      </div>
-                      <div class="form-row">
-                          <div class="form-group col">
-                              <label for="careerJoiningdate">Joining Date:</label>
-                              <input type="date" name="careerJoiningdate[]" class="form-control">
-                          </div>
-                          <div class="form-group col">
-                              <label for="careerLeavingdate">Leaving Date:</label>
-                              <input type="date" name="careerLeavingdate[]" class="form-control">
-                          </div>
-                      </div>
-                  `;
-                  careerFieldsDiv.appendChild(newCareerFieldDiv);
-              });
-          </script>
 
-         
+
+              <script>
+                  document.getElementById('addCareerField').addEventListener('click', function() {
+                      var careerFields = document.getElementById('careerFields');
+                      var newCareerField = careerFields.firstElementChild.cloneNode(true);
+                      careerFields.appendChild(newCareerField);
+                  });
+              </script>
+        <script>
+            document.getElementById('addFamilyMember').addEventListener('click', function() {
+                // Clone the first family member div
+                var clone = document.querySelector('.familyMember').cloneNode(true);
+                // Append the cloned div to the family members container
+                document.getElementById('familyMembers').appendChild(clone);
+            });
+        </script>
+        <script>
+            document.getElementById('addWeapons').addEventListener('click', function() {
+                // Clone the weapons div
+                var clone = document.querySelector('.weapons').cloneNode(true);
+                // Reset the input values
+                var inputs = clone.querySelectorAll('input');
+                inputs.forEach(function(input) {
+                    input.value = '';
+                });
+                // Append the cloned div to the newWeapons container
+                document.getElementById('newWeapons').appendChild(clone);
+            });
+        </script>
+
 {% endblock %}
