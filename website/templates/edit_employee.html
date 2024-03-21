@@ -14,16 +14,21 @@
 
       <div class="container mt-4">
           <h1>Edit Employee</h1>
-
         <div class="container">
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="text-center">
                             <div class="profile-userpic">
-                                <img id="uploadedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" class="img-responsive" alt="" style="width: 100%;">
+                                {% if photo %}
+                                    <p>Photo exists</p>
+                                    <p>Photo Path: {{ photo.path }}</p>
+                                    <img id="uploadedImage" src="https://{{bucket_name}}.s3.amazonaws.com/{{ file_path }}" class="img-responsive" alt="" style="width: 100%;">
+                                {% else %}
+                                    <p>No photo available</p>
+                                {% endif %}
                             </div>
-                            <form action="/upload" method="post" enctype="multipart/form-data">
+                            <form action="{{ url_for('views.upload', employee_id=employee.employee_id) }}" method="post" enctype="multipart/form-data">
                                 <div class="form-group mt-3">
                                     <input type="file" class="form-control-file" id="exampleInputFile" name="file" accept="image/*"> 
                                 </div>
@@ -33,9 +38,14 @@
                             </form>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
+
+
+       </div>
+
         <form method="POST" >
             <div class="form-group">
                 <label for="first_name">First Name: <span style="color: red;">*</span></label>
@@ -257,38 +267,44 @@
               </select>
           </div>
           
-          <!-- Weapon details -->
-          {% for weapon in weapons %}
-          <div class="row weapon-row" data-id="{{ weapon.id }}">
-              <div class="col-md-6">
-                  <label for="weapon_{{ weapon.id }}" class="form-label">Weapon:</label>
-                  <input type="text" class="form-control weapon-input" id="weapon_{{ weapon.id }}" name="weapon_{{ weapon.id }}" value="{{ weapon.weapon }}">
-              </div>
-              <div class="col-md-4">
-                  <label for="license_{{ weapon.id }}" class="form-label">License:</label>
-                  <input type="text" class="form-control license-input" id="license_{{ weapon.id }}" name="license_{{ weapon.id }}" value="{{ weapon.license }}">
-              </div>
-              <div class="col-md-2">
-                  <button type="button" class="btn btn-danger delete-weapon" data-id="{{ weapon.id }}">Delete</button>
-              </div>
+          <div id="weaponsContainer">
+            <!-- Weapon details -->
+            {% for weapon in weapons %}
+            <div class="row weapon-row" data-id="{{ weapon.id }}">
+                <div class="col-md-6">
+                    <label for="weapon_{{ weapon.id }}" class="form-label">Weapon:</label>
+                    <input type="text" class="form-control weapon-input" id="weapon_{{ weapon.id }}" name="weapon_{{ weapon.id }}" value="{{ weapon.weapon }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="license_{{ weapon.id }}" class="form-label">License:</label>
+                    <input type="text" class="form-control license-input" id="license_{{ weapon.id }}" name="license_{{ weapon.id }}" value="{{ weapon.license }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger delete-weapon" data-id="{{ weapon.id }}">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-         
+
           <button type="button" id="addWeapon" class="btn btn-info mt-3">Add More</button>
 
+          <!-- Hidden input for deleted weapon IDs -->
+          <input type="hidden" id="deleted_weapon_ids" name="deleted_weapon_ids" value="">
+    
+          
 
           <!-- Career details -->
           {% for career in careers %}
           <div class="row career-row" data-id="{{ career.id }}">
-              <div class="col-md-4">
+              <div class="col">
                   <label for="career_company_{{ career.id }}" class="form-label">Company:</label>
                   <input type="text" class="form-control career-company" id="career_company_{{ career.id }}" name="career_company_{{ career.id }}" value="{{ career.company }}">
               </div>
-              <div class="col-md-4">
+              <div class="col">
                   <label for="career_joiningdate_{{ career.id }}" class="form-label">Joining Date:</label>
                   <input type="date" class="form-control career-joiningdate" id="career_joiningdate_{{ career.id }}" name="career_joiningdate_{{ career.id }}" value="{{ career.joiningdate }}">
               </div>
-              <div class="col-md-4">
+              <div class="col">
                   <label for="career_leavingdate_{{ career.id }}" class="form-label">Leaving Date:</label>
                   <input type="date" class="form-control career-leavingdate" id="career_leavingdate_{{ career.id }}" name="career_leavingdate_{{ career.id }}" value="{{ career.leavingdate }}">
               </div>
@@ -297,6 +313,14 @@
               </div>
           </div>
           {% endfor %}
+
+          <!-- Career fields -->
+          <div id="careerFields">
+              <div class="career-field">
+                <!---New career field-->
+              </div>
+          </div>
+
           <button type="button" id="addCareerField" class="btn btn-info mt-3">Add More</button>
           <input type="hidden" id="deleted_career_ids" name="deleted_career_ids" value="">
 
@@ -425,52 +449,7 @@
                  });
              });
          </script>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                // Function to handle deleting weapon
-                function deleteWeapon(event) {
-                    var weaponId = event.target.dataset.id;
-                    var weaponRow = event.target.closest(".weapon-row");
-                    weaponRow.parentNode.removeChild(weaponRow);
-                    var deletedWeaponIdsInput = document.getElementById("deleted_weapon_ids");
-                    deletedWeaponIdsInput.value += weaponId + ",";
-                }
-
-                // Add event listener to all delete weapon buttons
-                document.querySelectorAll(".delete-weapon").forEach(function(button) {
-                    button.addEventListener("click", deleteWeapon);
-                });
-
-                // Function to handle adding new weapon
-                function addWeapon() {
-                    var weaponsContainer = document.getElementById("weaponsContainer");
-                    var timestamp = Date.now();
-                    var newWeaponRow = document.createElement('div');
-                    newWeaponRow.classList.add('row', 'weapon-row');
-                    newWeaponRow.dataset.id = timestamp;
-                    newWeaponRow.innerHTML = `
-                        <div class="col-md-6">
-                            <label for="weapon_${timestamp}" class="form-label">Weapon:</label>
-                            <input type="text" class="form-control weapon-input" id="weapon_${timestamp}" name="new_weapon[]" value="">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="license_${timestamp}" class="form-label">License:</label>
-                            <input type="text" class="form-control license-input" id="license_${timestamp}" name="new_license[]" value="">
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-danger delete-weapon" data-id="${timestamp}">Delete</button>
-                        </div>
-                    `;
-                    weaponsContainer.appendChild(newWeaponRow);
-
-                    // Add event listener to the delete button of the new weapon
-                    newWeaponRow.querySelector('.delete-weapon').addEventListener('click', deleteWeapon);
-                }
-
-                // Add event listener to the add weapon button
-                document.getElementById("addWeapon").addEventListener("click", addWeapon);
-            });
-        </script>
+        
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 // Function to handle deleting career
@@ -494,23 +473,7 @@
                     var newCareerRow = document.createElement('div');
                     newCareerRow.classList.add('row', 'career-row');
                     newCareerRow.dataset.id = timestamp;
-                    newCareerRow.innerHTML = `
-                        <div class="col-md-4">
-                            <label for="career_company_${timestamp}" class="form-label">Company:</label>
-                            <input type="text" class="form-control career-company" id="career_company_${timestamp}" name="new_career_company[]" value="">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="career_joiningdate_${timestamp}" class="form-label">Joining Date:</label>
-                            <input type="date" class="form-control career-joiningdate" id="career_joiningdate_${timestamp}" name="new_career_joiningdate[]" value="">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="career_leavingdate_${timestamp}" class="form-label">Leaving Date:</label>
-                            <input type="date" class="form-control career-leavingdate" id="career_leavingdate_${timestamp}" name="new_career_leavingdate[]" value="">
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-danger delete-career" data-id="${timestamp}">Delete</button>
-                        </div>
-                    `;
+                    
                     careersContainer.appendChild(newCareerRow);
 
                     // Add event listener to the delete button of the new career
@@ -541,9 +504,67 @@
                             <input type="date" name="careerLeavingdate[]" class="form-control">
                         </div>
                     </div>
+                    <button type="button" class="btn btn-danger delete-career">Delete</button>
                 `;
                 careerFieldsDiv.appendChild(newCareerFieldDiv);
             });
-        </script>
 
+            // Event listener for deleting career fields
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('delete-career')) {
+                    event.target.parentElement.remove();
+                }
+            });
+        </script>
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to handle deleting weapon
+            function deleteWeapon(event) {
+                var weaponId = event.target.dataset.id;
+                var weaponRow = event.target.closest(".weapon-row");
+                weaponRow.parentNode.removeChild(weaponRow);
+
+                // Add deleted weapon ID to the hidden input
+                var deletedWeaponIdsInput = document.getElementById("deleted_weapon_ids");
+                deletedWeaponIdsInput.value += weaponId + ",";
+            }
+
+            // Add event listener to all delete weapon buttons
+            document.querySelectorAll(".delete-weapon").forEach(function(button) {
+                button.addEventListener("click", deleteWeapon);
+            });
+
+            // Function to handle adding new weapon
+            function addWeapon() {
+                var weaponsContainer = document.getElementById("weaponsContainer");
+                var timestamp = Date.now();
+                var newWeaponRow = document.createElement('div');
+                newWeaponRow.classList.add('row', 'weapon-row');
+                newWeaponRow.dataset.id = timestamp;
+
+                // HTML for the new weapon row
+                newWeaponRow.innerHTML = `
+                    <div class="col-md-6">
+                        <label class="form-label">Weapon:</label>
+                        <input type="text" class="form-control weapon-input" name="new_weapon[]" value="">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">License:</label>
+                        <input type="text" class="form-control license-input" name="new_license[]" value="">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger delete-weapon" data-id="${timestamp}">Delete</button>
+                    </div>
+                `;
+
+                weaponsContainer.appendChild(newWeaponRow);
+
+                // Add event listener to the delete button of the new weapon
+                newWeaponRow.querySelector('.delete-weapon').addEventListener('click', deleteWeapon);
+            }
+
+            // Add event listener to the add weapon button
+            document.getElementById("addWeapon").addEventListener("click", addWeapon);
+        });
+        </script>
 {% endblock %}

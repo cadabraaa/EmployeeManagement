@@ -9,3 +9,4 @@ flask-login
 flask-migrate
 flask-cors
 Pillow
+boto3

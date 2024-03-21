@@ -24,16 +24,20 @@
                       <div class="card-body">
                           <div class="row align-items-center">
 
-                              <!-- Profile Picture -->
-                              <div class="col-md-4 d-flex justify-content-center">
-                                  <img id="selectedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" alt="example placeholder" style="width: 300px;" />
-                              </div>
+                              <div class="container">
+                                  <div class="col-md-4 d-flex justify-content-center">
+                                      <img id="selectedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" alt="Example Placeholder" style="width: 300px;">
+                                  </div>
 
-                              <div class="d-flex justify-content-center">
-                                  <!-- Display the uploaded photo dynamically -->
-                                  {% if file_path %}
-                                      <img id="uploadedPhoto" src="{{ url_for('media', filename=file_path) }}" alt="Uploaded Photo" style="width: 300px;">
-                                  {% endif %}
+                                  <div class="d-flex justify-content-center">
+                                      <!-- Display the uploaded photo dynamically if photo exists -->
+                                     <div class="d-flex justify-content-center">
+                                         <!-- Display the uploaded photo dynamically if photo exists -->
+                                         {% if photo %}
+                                             <img id="uploadedPhoto" src="https://{{bucket_name}}.s3.amazonaws.com/{{ photo.path }}" alt="Uploaded Photo" style="width: 300px;">
+                                         {% endif %}
+                                     </div>
+                                  </div>
                               </div>
 
                               <!-- Non-editable user information -->

@@ -20,7 +20,7 @@ class Employee(db.Model):
     first_name = db.Column(db.String(150))
     middle_name = db.Column(db.String(150))
     last_name = db.Column(db.String(150))
-    email = db.Column(db.String(150), unique=True)
+    email = db.Column(db.String(150))
     mobile = db.Column(BigInteger)
     birthdate = db.Column(db.Date)
     height = db.Column(db.Float)
@@ -48,7 +48,7 @@ class Gender(db.Model, UserMixin):
 
 class Role(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
-  role = db.Column(db.String(50), unique=True)
+  role = db.Column(db.String(50))
   description = db.Column(db.String(255))
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   employees = db.relationship('Employee', backref='role', lazy=True)
@@ -68,6 +68,7 @@ class Photo(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   path = db.Column(db.String(255), unique=True)
   employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+  
 
 class Identification(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)

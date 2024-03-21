@@ -8,6 +8,8 @@ from PIL import Image
 from werkzeug.utils import secure_filename
 from . import create_app
 import time
+import boto3
+from botocore.exceptions import ClientError
 
 views = Blueprint('views', __name__)
 CORS(views)
@@ -59,6 +61,9 @@ def employee_details(employee_id):
     weapons = Weapon.query.filter_by(employee_id=employee.employee_id).all()
     careers = Career.query.filter_by(employee_id=employee.employee_id).all()
     army = Army.query.filter_by(employee_id=employee.employee_id).all()
+    photo = Photo.query.filter_by(employee_id=employee.employee_id).first()
+
+    
 
     return render_template("employee_details.html",
                            employee=employee,
@@ -69,6 +74,7 @@ def employee_details(employee_id):
                            weapons=weapons,
                            careers=careers,
                            army=army,
+                           photo=photo,
                            user=current_user)
   else:
     flash('Employee not found.', category='error')
@@ -282,6 +288,7 @@ def edit_employee(employee_id):
     family = Family.query.filter_by(employee_id=employee_id).all()
     careers = Career.query.filter_by(employee_id=employee_id).all()
     weapons = Weapon.query.filter_by(employee_id=employee_id).all()
+    photo = Photo.query.filter_by(employee_id=employee_id).first()
 
   if not employee:
     flash('Employee not found.', category='error')
@@ -330,6 +337,7 @@ def edit_employee(employee_id):
     force = request.form.get('force')
     joining = request.form.get('joining')
     leaving = request.form.get('leaving')
+    path = request.files.get('path')
 
     if not first_name or not last_name or not email or not mobile:
       flash('All fields are required.', category='error')
@@ -367,28 +375,31 @@ def edit_employee(employee_id):
         paddress.city_id = pcity_id
         paddress.state_id = pstate_id
         paddress.country_id = pcountry_id
+        photo.path = path
 
-        
         # Update existing family members
         for member in family:
-            member.fullname = request.form.get(f'family_name_{member.id}')
-            member.relation = request.form.get(f'family_relation_{member.id}')
-            member.birthdate = request.form.get(f'family_birthdate_{member.id}')
+          member.fullname = request.form.get(f'family_name_{member.id}')
+          member.relation = request.form.get(f'family_relation_{member.id}')
+          member.birthdate = request.form.get(f'family_birthdate_{member.id}')
 
         # Create new family members
-        for name, bdate, relation in zip(request.form.getlist('familyName[]'), request.form.getlist('familyBirthdate[]'), request.form.getlist('familyRelation[]')):
-            new_family_member = Family(employee_id=employee.employee_id,
-                                       fullname=name,
-                                       birthdate=bdate,
-                                       relation=relation)
-            db.session.add(new_family_member)
+        for name, bdate, relation in zip(
+            request.form.getlist('familyName[]'),
+            request.form.getlist('familyBirthdate[]'),
+            request.form.getlist('familyRelation[]')):
+          new_family_member = Family(employee_id=employee.employee_id,
+                                     fullname=name,
+                                     birthdate=bdate,
+                                     relation=relation)
+          db.session.add(new_family_member)
 
         # Delete family members
         deleted_member_ids = request.form.getlist('deleted_family_member_ids')
         for member_id in deleted_member_ids:
-            member_to_delete = Family.query.get(member_id)
-            if member_to_delete:
-                db.session.delete(member_to_delete)
+          member_to_delete = Family.query.get(member_id)
+          if member_to_delete:
+            db.session.delete(member_to_delete)
 
         # Update existing weapons
         for weapon in weapons:
@@ -396,7 +407,7 @@ def edit_employee(employee_id):
           license_number = request.form.get(f'license_{weapon.id}')
           weapon.weapon = weapon_type
           weapon.license = license_number
-         
+
 
         # Delete existing weapons
         deleted_weapon_ids = request.form.getlist('deleted_weapon_ids')
@@ -418,28 +429,30 @@ def edit_employee(employee_id):
         # Add new weapons to the database
         db.session.add_all(new_weapons)
 
-
         # Update career details
         for career in careers:
-            career.company = request.form.get(f'career_company_{career.id}')
-            career.joiningdate = request.form.get(f'career_joiningdate_{career.id}')
-            career.leavingdate = request.form.get(f'career_leavingdate_{career.id}')
+          career.company = request.form.get(f'career_company_{career.id}')
+          career.joiningdate = request.form.get(
+              f'career_joiningdate_{career.id}')
+          career.leavingdate = request.form.get(
+              f'career_leavingdate_{career.id}')
 
         # Delete existing career entries
         deleted_career_ids = request.form.getlist('deleted_career_ids')
         for career_id in deleted_career_ids:
-            career_to_delete = Career.query.get(career_id)
-            if career_to_delete:
-                db.session.delete(career_to_delete)
+          career_to_delete = Career.query.get(career_id)
+          if career_to_delete:
+            db.session.delete(career_to_delete)
 
         # Create new career entries
-        for company, cjoiningdate, cleavingdate in zip(career_companies, career_joiningdates, career_leavingdates):
-            new_career = Career(employee_id=employee.employee_id,
-                                company=company,
-                                joiningdate=cjoiningdate,
-                                leavingdate=cleavingdate)
-            db.session.add(new_career)
-
+        for company, cjoiningdate, cleavingdate in zip(career_companies,
+                                                       career_joiningdates,
+                                                       career_leavingdates):
+          new_career = Career(employee_id=employee.employee_id,
+                              company=company,
+                              joiningdate=cjoiningdate,
+                              leavingdate=cleavingdate)
+          db.session.add(new_career)
 
         # Update Army details
         if army:
@@ -469,7 +482,7 @@ def edit_employee(employee_id):
   maritals = Marital.query.all()
   countries = Country.query.all()
   states = State.query.all()
-  cities = City.query.all()
+  cities = City.query.all()  
   roles = Role.query.filter_by(user_id=current_user.id).all()
 
   return render_template("edit_employee.html",
@@ -488,11 +501,166 @@ def edit_employee(employee_id):
                          states=states,
                          cities=cities,
                          roles=roles,
+                         photo=photo,
                          user=current_user)
 
 
 ######## ADD PHOTO ########
 
+  
+s3 = boto3.client('s3',
+                  aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+                  aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+                  region_name='ap-south-1'
+                  )
+bucket_name = 'securityemployee'  
+
+@views.route('/upload/<employee_id>', methods=['POST'])
+@login_required
+def upload(employee_id):
+    # Fetch the employee based on the provided employee_id
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    identification = Identification.query.filter_by(
+        employee_id=employee_id).first()
+    caddress = Caddress.query.filter_by(employee_id=employee_id).first()
+    family = Family.query.filter_by(employee_id=employee_id).all()
+    weapons = Weapon.query.filter_by(employee_id=employee_id).all()
+    careers = Career.query.filter_by(employee_id=employee_id).all()
+    army = Army.query.filter_by(employee_id=employee_id).first()
+    paddress = Paddress.query.filter_by(employee_id=employee_id).first()
+    photo = Photo.query.filter_by(employee_id=employee_id).first()
+
+    if not employee:
+        flash("Employee not found.")
+        return redirect(url_for('some_redirect_route'))
+
+    if 'file' in request.files:
+      file = request.files['file']
+      if file.filename != '':
+          company_code = current_user.company_code
+          employee_folder = f"{company_code}/{employee_id}/"
+          unique_filename = f"uploaded_{int(time.time())}{os.path.splitext(file.filename)[1]}"
+          file_path = os.path.join(employee_folder, unique_filename)
+
+          # Delete the existing photo from S3 and database
+          if photo:
+              try:
+                  s3.delete_object(Bucket=bucket_name, Key=photo.path)
+              except ClientError as e:
+                  flash("An error occurred while deleting the existing photo from S3.")
+                  return redirect(url_for('some_redirect_route'))
+
+              db.session.delete(photo)
+              db.session.commit()
+
+          # Upload the file to S3
+          try:
+              s3.upload_fileobj(file, bucket_name, file_path)
+
+              # Create a new Photo object for the database
+              photo = Photo(path=file_path, employee_id=employee_id)
+
+              # Add the new photo to the database
+              db.session.add(photo)
+              db.session.commit()
+
+              # Construct the URL for serving static files
+              static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{file_path}"
+
+              return render_template('edit_employee.html',
+                                     employee=employee,
+                                     caddress=caddress,
+                                     identification=identification,
+                                     family=family,
+                                     weapons=weapons,
+                                     careers=careers,
+                                     paddress=paddress,
+                                     army=army,
+                                     user=current_user,
+                                     photo=photo,
+                                     file_path=static_file_path)
+          except ClientError as e:
+              if e.response['Error']['Code'] == 'NoCredentialsError':
+                  flash("Credentials not available.")
+              else:
+                  flash("An error occurred while uploading the file.")
+              return redirect(url_for('some_redirect_route'))
+
+
+
+'''
+@views.route('/upload/<employee_id>', methods=['POST'])
+@login_required
+def upload(employee_id):
+    # Fetch the employee based on the provided employee_id
+    employee = Employee.query.filter_by(employee_id=employee_id).all()
+    identification = Identification.query.filter_by(
+        employee_id=employee_id).first()
+    caddress = Caddress.query.filter_by(employee_id=employee_id).first()
+    family = Family.query.filter_by(employee_id=employee_id).all()
+    weapons = Weapon.query.filter_by(employee_id=employee_id).all()
+    careers = Career.query.filter_by(employee_id=employee_id).all()
+    army = Army.query.filter_by(employee_id=employee_id).first()
+    paddress = Paddress.query.filter_by(employee_id=employee_id).first()
+    photo = Photo.query.filter_by(employee_id=employee_id).first()
+
+    if not employee:
+        flash("Employee not found.")
+        return redirect(url_for('some_redirect_route'))
+          
+
+    existing_photo = Photo.query.filter_by(employee_id=employee_id).first()
+    if existing_photo:
+        # Delete the existing photo file from the file system
+        existing_photo_path = os.path.join('website', 'static', 'media', existing_photo.path)
+        if os.path.exists(existing_photo_path):
+            os.remove(existing_photo_path)
+
+        # Delete the existing photo record from the database
+        db.session.delete(existing_photo)
+        db.session.commit()
+
+    if 'file' in request.files:
+      file = request.files['file']
+      if file.filename != '':
+          company_code = current_user.company_code
+
+          company_folder = os.path.join('static', 'media', company_code)
+          os.makedirs(os.path.join('website', company_folder), exist_ok=True)
+
+          employee_folder = os.path.join(company_folder, employee_id)
+          os.makedirs(os.path.join('website', employee_folder), exist_ok=True)
+
+          unique_filename = f"uploaded_{int(time.time())}{os.path.splitext(file.filename)[1]}"
+          file_path = os.path.join(employee_folder, unique_filename)
+
+          file.save(os.path.join('website', file_path))
+
+          # Create a new Photo object for the database
+          photo = Photo(path=os.path.join(company_code, employee_id, unique_filename),
+                        employee_id=employee_id)
+
+          # Add the new photo to the database
+          db.session.add(photo)
+          db.session.commit()
+
+          # Construct the URL for serving static files
+          static_file_path = os.path.join('media', company_code, employee_id, unique_filename)
+
+          return render_template('edit_employee.html',
+                                 employee=employee,
+                                 caddress=caddress,
+                                 identification=identification,
+                                 family=family,
+                                 weapons=weapons,
+                                 careers=careers,
+                                 paddress=paddress,
+                                 army=army,
+                                 user=current_user,
+                                 photo=photo,
+                                 file_path=static_file_path)
+                                 
+'''
 ######## ADD ROLES ########
 
 

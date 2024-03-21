@@ -4,6 +4,9 @@ from os import path
 from flask_login import LoginManager
 import os
 from flask_migrate import Migrate
+from flask_cors import CORS
+import boto3
+
 
 db = SQLAlchemy()
 
@@ -15,6 +18,14 @@ def create_app():
     app.config['SECRET_KEY'] = 'secret_key'
     db_connection = os.environ['DB_CONNECTION_STRING']
     app.config['SQLALCHEMY_DATABASE_URI'] = db_connection
+
+    client = boto3.client('s3',
+                          aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+                          aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY']
+                          )
+    response = client.list_buckets()
+    for bucket in response['Buckets']:
+        print(bucket['Name'])
   
     db.init_app(app)
 
