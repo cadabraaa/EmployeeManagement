@@ -20,9 +20,10 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = db_connection
 
     client = boto3.client('s3',
-                          aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-                          aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY']
-                          )
+                        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+                        aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+                        region_name=os.environ['AWS_REGION']
+                        )
     response = client.list_buckets()
     for bucket in response['Buckets']:
         print(bucket['Name'])

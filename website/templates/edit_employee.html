@@ -22,8 +22,8 @@
                             <div class="profile-userpic">
                                 {% if photo %}
                                     <p>Photo exists</p>
-                                    <p>Photo Path: {{ photo.path }}</p>
-                                    <img id="uploadedImage" src="https://{{bucket_name}}.s3.amazonaws.com/{{ file_path }}" class="img-responsive" alt="" style="width: 100%;">
+                                    <p>Photo Path: {{ photo.static_file_path }}</p>
+                                    <img id="uploadedImage" src="{{ static_file_path }}" class="img-responsive" alt="" style="width: 100%;">
                                 {% else %}
                                     <p>No photo available</p>
                                 {% endif %}
@@ -286,9 +286,8 @@
             {% endfor %}
           </div>
 
-          <button type="button" id="addWeapon" class="btn btn-info mt-3">Add More</button>
 
-          <!-- Hidden input for deleted weapon IDs -->
+          <button type="button" id="addWeapon" class="btn btn-info mt-3">Add More</button>
           <input type="hidden" id="deleted_weapon_ids" name="deleted_weapon_ids" value="">
     
           
@@ -567,4 +566,5 @@
             document.getElementById("addWeapon").addEventListener("click", addWeapon);
         });
         </script>
+         
 {% endblock %}

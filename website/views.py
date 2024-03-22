@@ -8,8 +8,8 @@ from PIL import Image
 from werkzeug.utils import secure_filename
 from . import create_app
 import time
-import boto3
 from botocore.exceptions import ClientError
+import boto3
 
 views = Blueprint('views', __name__)
 CORS(views)
@@ -337,7 +337,7 @@ def edit_employee(employee_id):
     force = request.form.get('force')
     joining = request.form.get('joining')
     leaving = request.form.get('leaving')
-    path = request.files.get('path')
+    static_file_path = request.files.get('static_file_path')
 
     if not first_name or not last_name or not email or not mobile:
       flash('All fields are required.', category='error')
@@ -375,7 +375,7 @@ def edit_employee(employee_id):
         paddress.city_id = pcity_id
         paddress.state_id = pstate_id
         paddress.country_id = pcountry_id
-        photo.path = path
+        photo.static_file_path = static_file_path
 
         # Update existing family members
         for member in family:
@@ -418,13 +418,20 @@ def edit_employee(employee_id):
 
         # Create new weapons
         new_weapons = []
-        for i in range(len(request.form.getlist('new_weapon'))):
-            weapon_type = request.form.getlist('new_weapon')[i]
-            license_number = request.form.getlist('new_license')[i]
-            new_weapon = Weapon(employee_id=employee.employee_id,
-                                weapon=weapon_type,
-                                license=license_number)
-            new_weapons.append(new_weapon)
+        new_weapon_types = request.form.getlist('new_weapon[]')
+        new_license_numbers = request.form.getlist('new_license[]')
+
+        # Ensure the lengths of both lists are the same
+        if len(new_weapon_types) == len(new_license_numbers):
+            for weapon_type, license_number in zip(new_weapon_types, new_license_numbers):
+                # Only create a new weapon if both the type and license are provided
+                if weapon_type:
+                    new_weapon = Weapon(employee_id=employee.employee_id,
+                                        weapon=weapon_type,
+                                        license=license_number)
+                    new_weapons.append(new_weapon)
+        else:
+            flash('Invalid new weapon data.', category='error')
 
         # Add new weapons to the database
         db.session.add_all(new_weapons)
@@ -507,21 +514,24 @@ def edit_employee(employee_id):
 
 ######## ADD PHOTO ########
 
-  
 s3 = boto3.client('s3',
                   aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
                   aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
                   region_name='ap-south-1'
                   )
-bucket_name = 'securityemployee'  
+bucket_name = 'securityemployee'
 
+ALLOWED_FILE_TYPES = {'png', 'jpg', 'jpeg'}
+
+def get_file_type(filename): 
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() 
+  
 @views.route('/upload/<employee_id>', methods=['POST'])
 @login_required
 def upload(employee_id):
     # Fetch the employee based on the provided employee_id
     employee = Employee.query.filter_by(employee_id=employee_id).first()
-    identification = Identification.query.filter_by(
-        employee_id=employee_id).first()
+    identification = Identification.query.filter_by(employee_id=employee_id).first()
     caddress = Caddress.query.filter_by(employee_id=employee_id).first()
     family = Family.query.filter_by(employee_id=employee_id).all()
     weapons = Weapon.query.filter_by(employee_id=employee_id).all()
@@ -531,21 +541,27 @@ def upload(employee_id):
     photo = Photo.query.filter_by(employee_id=employee_id).first()
 
     if not employee:
-        flash("Employee not found.")
-        return redirect(url_for('some_redirect_route'))
+      flash("Employee not found.")
+      return redirect(url_for('some_redirect_route'))
 
     if 'file' in request.files:
       file = request.files['file']
       if file.filename != '':
+          # Check if the file type is allowed
+          if get_file_type(file.filename) not in ALLOWED_FILE_TYPES:
+              flash("File type not allowed.")
+              return redirect(url_for('some_redirect_route'))
+
+          # Generate unique file name and employee folder path
           company_code = current_user.company_code
           employee_folder = f"{company_code}/{employee_id}/"
           unique_filename = f"uploaded_{int(time.time())}{os.path.splitext(file.filename)[1]}"
-          file_path = os.path.join(employee_folder, unique_filename)
+          file_path = os.path.join(employee_folder, secure_filename(unique_filename))
 
-          # Delete the existing photo from S3 and database
+          # Delete the existing photo from S3 and database if exists
           if photo:
               try:
-                  s3.delete_object(Bucket=bucket_name, Key=photo.path)
+                  s3.delete_object(Bucket=bucket_name, Key=photo.stored_file_name)
               except ClientError as e:
                   flash("An error occurred while deleting the existing photo from S3.")
                   return redirect(url_for('some_redirect_route'))
@@ -557,28 +573,22 @@ def upload(employee_id):
           try:
               s3.upload_fileobj(file, bucket_name, file_path)
 
-              # Create a new Photo object for the database
-              photo = Photo(path=file_path, employee_id=employee_id)
-
-              # Add the new photo to the database
+              # Save the unique file name in the database
+              photo = Photo(stored_file_name=file_path, employee_id=employee_id)
               db.session.add(photo)
               db.session.commit()
+
+              # Generate pre-signed URL for the uploaded photo
+              presigned_url = s3.generate_presigned_url(
+                  'get_object',
+                  Params={'Bucket': bucket_name, 'Key': file_path},
+                  ExpiresIn=3600  # URL expires in 1 hour, adjust as needed
+              )
 
               # Construct the URL for serving static files
               static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{file_path}"
 
-              return render_template('edit_employee.html',
-                                     employee=employee,
-                                     caddress=caddress,
-                                     identification=identification,
-                                     family=family,
-                                     weapons=weapons,
-                                     careers=careers,
-                                     paddress=paddress,
-                                     army=army,
-                                     user=current_user,
-                                     photo=photo,
-                                     file_path=static_file_path)
+              return jsonify({'presigned_url': presigned_url, 'static_file_path': static_file_path})
           except ClientError as e:
               if e.response['Error']['Code'] == 'NoCredentialsError':
                   flash("Credentials not available.")
@@ -586,6 +596,18 @@ def upload(employee_id):
                   flash("An error occurred while uploading the file.")
               return redirect(url_for('some_redirect_route'))
 
+    # If the file upload fails or if no file was uploaded, render the edit_employee template
+    return render_template('edit_employee.html',
+                         employee=employee,
+                         caddress=caddress,
+                         identification=identification,
+                         family=family,
+                         weapons=weapons,
+                         careers=careers,
+                         paddress=paddress,
+                         army=army,
+                         photo=photo,
+                         user=current_user)
 
 
 '''

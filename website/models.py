@@ -66,7 +66,7 @@ class Marital(db.Model, UserMixin):
 
 class Photo(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
-  path = db.Column(db.String(255), unique=True)
+  stored_file_name = db.Column(db.String(255))
   employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
   
 

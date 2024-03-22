@@ -34,7 +34,7 @@
                                      <div class="d-flex justify-content-center">
                                          <!-- Display the uploaded photo dynamically if photo exists -->
                                          {% if photo %}
-                                             <img id="uploadedPhoto" src="https://{{bucket_name}}.s3.amazonaws.com/{{ photo.path }}" alt="Uploaded Photo" style="width: 300px;">
+                                             <img id="uploadedPhoto" src="{{ photo.presigned_url }}" alt="Uploaded Photo" style="width: 300px;">
                                          {% endif %}
                                      </div>
                                   </div>
