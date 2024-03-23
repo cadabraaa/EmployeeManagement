@@ -12,7 +12,7 @@
       {% endwith %}
 
       <div class="container mt-4">
-          <h1>Add Employee</h1>
+          <h1>Edit Employee Details</h1>
         <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-primary mt-4">Save</button>
         </div>
@@ -72,58 +72,44 @@
           <!--Navagation of employee details ends-->
 
           <!--Basic required details of employee starts-->
-                    <div class="card-body">
-                      <div class="tab-content">
-                        <div class="tab-pane fade show active" id="update" role="tabpanel" aria-labelledby="update-tab">
-                          <form method="POST" action="{{ url_for('views.add_employee') }}">
-                              <div class="form-group">
-                                  <label for="first_name">First Name: <span style="color: red;">*</span></label>
-                                  <input type="text" class="form-control" id="first_name" name="first_name" required pattern="[A-Za-z]{3,}" title="Please enter a valid first name (at least 3 letters)">
-                              </div>
-
-                              <div class="form-group">
-                                  <label for="middle_name">Middle Name (Optional):</label>
-                                  <input type="text" class="form-control" id="middle_name" name="middle_name">
-                              </div>
-
-                              <div class="form-group">
-                                  <label for="last_name">Last Name: <span style="color: red;">*</span></label>
-                                  <input type="text" class="form-control" id="last_name" name="last_name" required pattern="[A-Za-z]{1,}" title="Please enter a valid last name (at least 1 letter)">
-                              </div>
-
-                              <div class="form-group">
-                                  <label for="gender">Gender: <span style="color: red;">*</span></label>
-                                  <select class="form-control" id="gender" name="gender" required>
-                                      <option value="" disabled selected>Select Gender</option>
-                                      {% for gender in genders %}
-                                          <option value="{{ gender.id }}">{{ gender.gender }}</option>
-                                      {% endfor %}
-                                  </select>
-                              </div>
-
-                              <div class="form-group">
-                                  <label for="role_id">Select Role: <span style="color: red;">*</span></label>
-                                  <select class="form-control" id="role_id" name="role_id" required>
-                                      <option value="" disabled selected>Select Role</option>
-                                      {% for role in roles %}
-                                          <option value="{{ role.id }}">{{ role.role }}</option>
-                                      {% endfor %}
-                                  </select>
-                              </div>
-
-                              <div class="form-group">
-                                  <label for="email">Email: <span style="color: red;">*</span></label>
-                                  <input type="email" class="form-control" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address">
-                              </div>
-
-                              <div class="form-group">
-                                  <label for="mobile">Mobile: <span style="color: red;">*</span></label>
-                                  <input type="tel" class="form-control" id="mobile" name="mobile" required pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number">
-                              </div>
-
-                              <button type="submit" class="btn btn-primary mt-4">Save</button>
-                          </form>
-                        </div>
+                  <form method="POST" >
+                    <div class="form-group">
+                        <label for="first_name">First Name: <span style="color: red;">*</span></label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ employee.first_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="middle_name">Middle Name:</label>
+                        <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{ employee.middle_name }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name: <span style="color: red;">*</span></label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ employee.last_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role: <span style="color: red;">*</span></label>
+                        <select class="form-control" id="role" name="role" required>
+                            {% for role in roles %}
+                                <option value="{{ role.id }}" {% if employee.role_id == role.id %} selected {% endif %}>{{ role.role }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender: <span style="color: red;">*</span></label>
+                        <select class="form-control" id="gender" name="gender" required>
+                            {% for gender in genders %}
+                                <option value="{{ gender.id }}" {% if employee.gender_id == gender.id %} selected {% endif %}>{{ gender.gender }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email: <span style="color: red;">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ employee.email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile: <span style="color: red;">*</span></label>
+                        <input type="text" class="form-control" id="mobile" name="mobile" value="{{ employee.mobile }}" required>
+                    </div>
+                </form>
             <!--Basic required details of employee ends-->
 
             <!--Personal details of employee starts-->

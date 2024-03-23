@@ -11,28 +11,9 @@
           {% endif %}
       {% endwith %}
 
-
       <div class="container mt-4">
           <h1>Add Employee</h1>
-        <div class="container">
-          <div class="col-md-4">
-              <div class="card">
-                <div class="card-body">
-                  <div class="text-center">
-                    <div class="profile-userpic">
-                      <img id="uploadedImage" src="{{url_for('static', filename='placeholder.jpg')}}" class="img-responsive" alt="" style="width: 100%;">
-                    </div>
-                    <div class="form-group mt-3">
-                      <input type="file" class="form-control-file" id="exampleInputFile">
-                    </div>
-                    <div class="input-group-append">
-                      <button class="btn btn-primary" type="submit">Upload</button>
-                    </div>
-                  </div>
-                </div>
-            </div>
-          </div>
-
+       
         <form method="POST" action="{{ url_for('views.add_employee') }}">
 
             <div class="form-group">

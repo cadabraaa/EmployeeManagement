@@ -11,7 +11,6 @@
           {% endif %}
       {% endwith %}
 
-
       <div class="container mt-4">
           <h1>Edit Employee</h1>
         <div class="container">
@@ -20,12 +19,8 @@
                     <div class="card-body">
                         <div class="text-center">
                             <div class="profile-userpic">
-                                {% if photo %}
-                                    <p>Photo exists</p>
-                                    <p>Photo Path: {{ photo.static_file_path }}</p>
+                                {% if static_file_path %}
                                     <img id="uploadedImage" src="{{ static_file_path }}" class="img-responsive" alt="" style="width: 100%;">
-                                {% else %}
-                                    <p>No photo available</p>
                                 {% endif %}
                             </div>
                             <form action="{{ url_for('views.upload', employee_id=employee.employee_id) }}" method="post" enctype="multipart/form-data">
@@ -36,6 +31,7 @@
                                     <button class="btn btn-primary" type="submit">Upload</button>
                                 </div>
                             </form>
+
                         </div>
                     </div>
 
@@ -566,5 +562,6 @@
             document.getElementById("addWeapon").addEventListener("click", addWeapon);
         });
         </script>
+      
          
 {% endblock %}

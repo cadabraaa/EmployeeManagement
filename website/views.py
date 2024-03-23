@@ -63,7 +63,12 @@ def employee_details(employee_id):
     army = Army.query.filter_by(employee_id=employee.employee_id).all()
     photo = Photo.query.filter_by(employee_id=employee.employee_id).first()
 
-    
+    # If photo exists, construct static file path
+    static_file_path = None
+    if photo:
+        static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{photo.stored_file_name}"
+
+      
 
     return render_template("employee_details.html",
                            employee=employee,
@@ -75,6 +80,7 @@ def employee_details(employee_id):
                            careers=careers,
                            army=army,
                            photo=photo,
+                           static_file_path=static_file_path,
                            user=current_user)
   else:
     flash('Employee not found.', category='error')
@@ -289,7 +295,13 @@ def edit_employee(employee_id):
     careers = Career.query.filter_by(employee_id=employee_id).all()
     weapons = Weapon.query.filter_by(employee_id=employee_id).all()
     photo = Photo.query.filter_by(employee_id=employee_id).first()
+    
+    # If photo exists, construct static file path
+    static_file_path = None
+    if photo:
+        static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{photo.stored_file_name}"
 
+    
   if not employee:
     flash('Employee not found.', category='error')
     return redirect(url_for('views.employee_list'))
@@ -337,7 +349,8 @@ def edit_employee(employee_id):
     force = request.form.get('force')
     joining = request.form.get('joining')
     leaving = request.form.get('leaving')
-    static_file_path = request.files.get('static_file_path')
+    
+   
 
     if not first_name or not last_name or not email or not mobile:
       flash('All fields are required.', category='error')
@@ -376,6 +389,8 @@ def edit_employee(employee_id):
         paddress.state_id = pstate_id
         paddress.country_id = pcountry_id
         photo.static_file_path = static_file_path
+
+
 
         # Update existing family members
         for member in family:
@@ -509,6 +524,8 @@ def edit_employee(employee_id):
                          cities=cities,
                          roles=roles,
                          photo=photo,
+                         current_user=current_user,
+                         static_file_path=static_file_path,
                          user=current_user)
 
 
@@ -531,13 +548,6 @@ def get_file_type(filename):
 def upload(employee_id):
     # Fetch the employee based on the provided employee_id
     employee = Employee.query.filter_by(employee_id=employee_id).first()
-    identification = Identification.query.filter_by(employee_id=employee_id).first()
-    caddress = Caddress.query.filter_by(employee_id=employee_id).first()
-    family = Family.query.filter_by(employee_id=employee_id).all()
-    weapons = Weapon.query.filter_by(employee_id=employee_id).all()
-    careers = Career.query.filter_by(employee_id=employee_id).all()
-    army = Army.query.filter_by(employee_id=employee_id).first()
-    paddress = Paddress.query.filter_by(employee_id=employee_id).first()
     photo = Photo.query.filter_by(employee_id=employee_id).first()
 
     if not employee:
@@ -582,13 +592,17 @@ def upload(employee_id):
               presigned_url = s3.generate_presigned_url(
                   'get_object',
                   Params={'Bucket': bucket_name, 'Key': file_path},
-                  ExpiresIn=3600  # URL expires in 1 hour, adjust as needed
+                  ExpiresIn=31536000  # URL expires in 1 hour, adjust as needed
               )
 
               # Construct the URL for serving static files
               static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{file_path}"
 
-              return jsonify({'presigned_url': presigned_url, 'static_file_path': static_file_path})
+              # Redirect back to edit_employee page with presigned URL and static file path
+              return redirect(url_for('views.edit_employee', employee_id=employee_id,
+                                       presigned_url=presigned_url, static_file_path=static_file_path))
+
+              
           except ClientError as e:
               if e.response['Error']['Code'] == 'NoCredentialsError':
                   flash("Credentials not available.")
@@ -599,15 +613,16 @@ def upload(employee_id):
     # If the file upload fails or if no file was uploaded, render the edit_employee template
     return render_template('edit_employee.html',
                          employee=employee,
-                         caddress=caddress,
-                         identification=identification,
-                         family=family,
-                         weapons=weapons,
-                         careers=careers,
-                         paddress=paddress,
-                         army=army,
-                         photo=photo,
+                           photo=photo,
                          user=current_user)
+
+
+def get_presigned_file_url(stored_file_name):
+    if not presigned_url or not provided_file_name:
+        return
+    return presigned_url.split('?')[0] + '?' + urlencode({
+        'response-content-disposition': f'attachment; filename="{provided_file_name}"'
+    })
 
 
 '''
