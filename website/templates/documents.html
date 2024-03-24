@@ -1,0 +1,161 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+    <div class="container mt-4">
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-success" role="alert">
+                      {{message}}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+      <div class="container mt-5">
+          <h2>Upload Documents</h2>
+          <form action="{{ url_for('views.upload_documents', employee_id=employee.employee_id) }}" method="post" enctype="multipart/form-data">
+              
+
+              <div id="filePreview" class="form-group">
+                  <div id="previewPlaceholder" style="width: 100%; height: 200px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center;">
+                      <!-- Preview content will be displayed here -->
+                  </div>
+              </div>
+            <div class="input-group mb-3">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="file" name="file" onchange="previewFile()">
+                    <label class="custom-file-label" for="file">Choose file</label>
+                </div>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Upload</button>
+                </div>
+            </div>
+
+              <div class="form-group">
+                  <label for="filename">Rename File <span class="text-danger">*</span>:</label>
+                  <input type="text" class="form-control" id="filename" name="filename" placeholder="Enter new file name" required>
+              </div>
+          </form>
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <h2>Document List</h2>
+                <ul class="list-group" id="documentList">
+                    {% for document in documents %}
+                        <li class="list-group-item document-item" data-url="{{ static_urls[loop.index0] }}">
+                            {{ document.document_name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <h2>Document Preview</h2>
+                <div class="preview" id="documentPreview">
+                    <p>Select a document from the list to preview it.</p>
+                </div>
+            </div>
+        </div>
+      </div>
+    </br>
+    </br>
+
+        <script>
+            function previewFile() {
+                const preview = document.getElementById('previewPlaceholder');
+                const file = document.getElementById('file').files[0];
+                const reader = new FileReader();
+
+                reader.onloadend = function () {
+                    preview.innerHTML = `<img src="${reader.result}" style="max-width: 100%; max-height: 100%;">`;
+                }
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.innerHTML = '<p>Preview</p>';
+                }
+            }
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const documentList = document.getElementById('documentList');
+                const documentPreview = document.getElementById('documentPreview');
+
+                // Function to update the document preview
+                function updatePreview(url) {
+                    // Clear existing content from preview area
+                    documentPreview.innerHTML = '';
+
+                    // Create an element to display the document
+                    const fileType = url.split('.').pop().toLowerCase();
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.style.width = '100%';
+                        documentPreview.appendChild(img);
+                    } else if (fileType === 'pdf') {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = url;
+                        iframe.style.width = '100%';
+                        iframe.style.height = '600px'; // Adjust height as needed
+                        documentPreview.appendChild(iframe);
+                    } else {
+                        const p = document.createElement('p');
+                        p.textContent = 'Preview not available for this file type.';
+                        documentPreview.appendChild(p);
+                    }
+                }
+
+                // Add click event listener to each document item
+                documentList.addEventListener('click', function (event) {
+                    if (event.target.classList.contains('document-item')) {
+                        event.preventDefault(); // Prevent default action of link
+                        const url = event.target.getAttribute('data-url');
+                        updatePreview(url);
+                    }
+                });
+
+                // Trigger click event on the first document item
+                const firstDocumentItem = documentList.querySelector('.document-item');
+                if (firstDocumentItem) {
+                    const firstDocumentUrl = firstDocumentItem.getAttribute('data-url');
+                    updatePreview(firstDocumentUrl);
+                }
+            });
+        </script>
+<script>
+  $(document).ready(function () {
+      // Handle document list item click event
+      $('.document-item').on('click', function () {
+          var url = $(this).data('url');
+          var fileExtension = url.split('.').pop().toLowerCase();
+          var previewContent = '';
+
+          if (fileExtension === 'pdf') {
+              previewContent = `<embed src="${url}" type="application/pdf" style="width: 100%; height: 100%;">`;
+          } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+              previewContent = `<img src="${url}" style="max-width: 100%; height: auto;">`;
+          } else {
+              previewContent = `<p>Preview not available for this file type.</p>`;
+          }
+
+          $('#documentPreview').html(previewContent);
+      });
+  });
+</script>
+
+         <style>
+             .preview {
+                 border: 1px solid #ccc;
+                 padding: 10px;
+                 height: calc(100vh - 170px); 
+                 overflow-y: auto;
+             }
+
+             .preview img {
+                 max-width: 100%;
+                 max-height: calc(100vh - 170px);
+             }
+         </style>
+
+
+      {%endblock%}	

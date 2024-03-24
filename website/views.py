@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .models import Employee, Role, Gender, Education, Marital, Family, Country, State, City, Photo, Identification, Caddress, Paddress, Weapon, Career, Army
+from .models import Employee, Role, Gender, Education, Marital, Family, Country, State, City, Photo, Identification, Caddress, Paddress, Weapon, Career, Army, Documents
 from flask_cors import CORS, cross_origin
 from . import db
 import os
@@ -9,7 +9,9 @@ from werkzeug.utils import secure_filename
 from . import create_app
 import time
 from botocore.exceptions import ClientError
+import botocore
 import boto3
+import datetime
 
 views = Blueprint('views', __name__)
 CORS(views)
@@ -19,6 +21,7 @@ CORS(views)
 @login_required
 def display():
   return render_template("display.html", user=current_user)
+  
 
 
 ######## DASHBOARD ########
@@ -538,13 +541,14 @@ s3 = boto3.client('s3',
                   )
 bucket_name = 'securityemployee'
 
-ALLOWED_FILE_TYPES = {'png', 'jpg', 'jpeg'}
+ALLOWED_FILE_TYPES = {'gif','png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'}
 
 def get_file_type(filename): 
     return '.' in filename and filename.rsplit('.', 1)[1].lower() 
   
 @views.route('/upload/<employee_id>', methods=['POST'])
 @login_required
+@cross_origin()
 def upload(employee_id):
     # Fetch the employee based on the provided employee_id
     employee = Employee.query.filter_by(employee_id=employee_id).first()
@@ -616,88 +620,153 @@ def upload(employee_id):
                            photo=photo,
                          user=current_user)
 
+######## ADD DOCUMENTS ########
+  
 
-def get_presigned_file_url(stored_file_name):
-    if not presigned_url or not provided_file_name:
-        return
-    return presigned_url.split('?')[0] + '?' + urlencode({
-        'response-content-disposition': f'attachment; filename="{provided_file_name}"'
-    })
-
-
-'''
-@views.route('/upload/<employee_id>', methods=['POST'])
+@views.route('/documents/<employee_id>', methods=['GET', 'POST'])
 @login_required
-def upload(employee_id):
-    # Fetch the employee based on the provided employee_id
-    employee = Employee.query.filter_by(employee_id=employee_id).all()
-    identification = Identification.query.filter_by(
-        employee_id=employee_id).first()
-    caddress = Caddress.query.filter_by(employee_id=employee_id).first()
-    family = Family.query.filter_by(employee_id=employee_id).all()
-    weapons = Weapon.query.filter_by(employee_id=employee_id).all()
-    careers = Career.query.filter_by(employee_id=employee_id).all()
-    army = Army.query.filter_by(employee_id=employee_id).first()
-    paddress = Paddress.query.filter_by(employee_id=employee_id).first()
-    photo = Photo.query.filter_by(employee_id=employee_id).first()
+@cross_origin()
+def documents(employee_id):
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    if not employee:
+        flash("Employee not found.")
+        return redirect(url_for('employee'))
+
+    documents = Documents.query.filter_by(employee_id=employee_id).all()
+
+    document_data = []
+    presigned_urls = {}
+    for document in documents:
+        document_entry = {'id': document.id, 'document_name': document.document_name}
+        document_data.append(document_entry)
+
+        try:
+            company_code = current_user.company_code
+            employee_folder = f"{company_code}/{employee_id}/"
+            file_path = os.path.join(employee_folder, document.document_name)
+
+            url = s3.generate_presigned_url('get_object',
+                                            Params={'Bucket': bucket_name, 'Key': file_path},
+                                            ExpiresIn=3600)  # URL expires in 1 hour, adjust as needed
+            presigned_urls[document.id] = url
+        except botocore.exceptions.ClientError as e:
+            flash(f"An error occurred while generating pre-signed URL for document ID {document.id}: {e}")
+
+    static_urls = []
+    for document in documents:
+        if document.document_path:
+            url = f"https://{bucket_name}.s3.amazonaws.com/{document.document_path}"
+            static_urls.append(url)
+        else:
+            flash(f"Document filepath is empty for document ID {document.id}. Skipping URL generation.")
+
+    return render_template('documents.html',
+                           employee=employee,
+                           documents=documents,
+                           static_urls=static_urls,
+                           presigned_urls=presigned_urls,
+                           user=current_user)
+
+
+
+
+@views.route('/upload_documents/<employee_id>', methods=['POST'])
+@login_required
+def upload_documents(employee_id):
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
 
     if not employee:
         flash("Employee not found.")
         return redirect(url_for('some_redirect_route'))
-          
-
-    existing_photo = Photo.query.filter_by(employee_id=employee_id).first()
-    if existing_photo:
-        # Delete the existing photo file from the file system
-        existing_photo_path = os.path.join('website', 'static', 'media', existing_photo.path)
-        if os.path.exists(existing_photo_path):
-            os.remove(existing_photo_path)
-
-        # Delete the existing photo record from the database
-        db.session.delete(existing_photo)
-        db.session.commit()
 
     if 'file' in request.files:
-      file = request.files['file']
-      if file.filename != '':
-          company_code = current_user.company_code
+        file = request.files['file']
+        filename = request.form.get('filename', file.filename)
 
-          company_folder = os.path.join('static', 'media', company_code)
-          os.makedirs(os.path.join('website', company_folder), exist_ok=True)
+        if file.filename != '':
+            # Check if the file type is allowed
+            if get_file_type(file.filename) not in ALLOWED_FILE_TYPES:
+                flash("File type not allowed.")
+                return redirect(url_for('some_redirect_route'))
 
-          employee_folder = os.path.join(company_folder, employee_id)
-          os.makedirs(os.path.join('website', employee_folder), exist_ok=True)
+            # Generate unique file name and employee folder path
+            company_code = current_user.company_code
+            employee_folder = f"{company_code}/{employee_id}/"
+            unique_filename = f"{filename}.{get_file_type(file.filename)}"
+            file_path = os.path.join(employee_folder, unique_filename)
 
-          unique_filename = f"uploaded_{int(time.time())}{os.path.splitext(file.filename)[1]}"
-          file_path = os.path.join(employee_folder, unique_filename)
+            # Check if the company folder and employee folder exist, if not create them
+            try:
+                s3.head_object(Bucket=bucket_name, Key=employee_folder)
+            except ClientError as e:
+                if e.response['Error']['Code'] == '404':
+                    # Create company folder
+                    s3.put_object(Bucket=bucket_name, Key=company_code+'/')
+                    # Create employee folder
+                    s3.put_object(Bucket=bucket_name, Key=employee_folder)
+                else:
+                    flash("An error occurred while checking folder existence.")
+                    return redirect(url_for('views.documents', employee_id=employee_id))
 
-          file.save(os.path.join('website', file_path))
+            # Upload the file to S3
+            try:
+                s3.upload_fileobj(file, bucket_name, file_path)
 
-          # Create a new Photo object for the database
-          photo = Photo(path=os.path.join(company_code, employee_id, unique_filename),
-                        employee_id=employee_id)
+                # Save document details to the database
+                document = Documents(employee_id=employee_id,
+                                     document_type=file.content_type,
+                                     document_name=filename,
+                                     document_path=file_path)
+                db.session.add(document)
+                db.session.commit()
 
-          # Add the new photo to the database
-          db.session.add(photo)
-          db.session.commit()
+                # Flash success message
+                flash("File uploaded successfully!", category="success")
+                # Redirect to a GET route after successful upload
+                return redirect(url_for('views.documents', employee_id=employee_id))
 
-          # Construct the URL for serving static files
-          static_file_path = os.path.join('media', company_code, employee_id, unique_filename)
+            except ClientError as e:
+                flash("An error occurred while uploading the file.")
+                return redirect(url_for('documents'))
 
-          return render_template('edit_employee.html',
-                                 employee=employee,
-                                 caddress=caddress,
-                                 identification=identification,
-                                 family=family,
-                                 weapons=weapons,
-                                 careers=careers,
-                                 paddress=paddress,
-                                 army=army,
-                                 user=current_user,
-                                 photo=photo,
-                                 file_path=static_file_path)
-                                 
-'''
+    # Fetch all documents for the employee
+    documents = Documents.query.filter_by(employee_id=employee_id).all()
+
+    # Generate pre-signed URLs for documents
+    presigned_urls = {}
+    for document in documents:
+        if document.document_path:
+            try:
+                url = s3.generate_presigned_url('get_object',
+                                                Params={'Bucket': bucket_name, 'Key': document.document_path},
+                                                ExpiresIn=31536000)  # URL expires in 1 hour, adjust as needed
+                presigned_urls[document.id] = url
+            except ClientError as e:
+                flash(f"An error occurred while generating pre-signed URL for document ID {document.id}.")
+        else:
+            flash(f"Document name is empty for document ID {document.id}. Skipping URL generation.")
+          # Extract static paths from pre-signed URLs for documents
+    static_paths = []
+    for document in documents:
+        if document.file_path:
+            try:
+                url = s3.generate_presigned_url('get_object',
+                                                Params={'Bucket': bucket_name, 'Key': document.file_path},
+                                                ExpiresIn=31536000)  # URL expires in 1 year, adjust as needed
+                # Extract path from the URL
+                static_path = url.split(bucket_name + '/')[1]
+                static_paths.append(static_path)
+            except ClientError as e:
+                flash(f"An error occurred while generating pre-signed URL for document ID {document.id}: {e}")
+        else:
+            flash(f"File path is empty for document ID {document.id}. Skipping URL extraction.")
+    return render_template('documents.html',
+                           employee=employee,
+                           documents=documents,
+                           presigned_urls=presigned_urls,
+                           user=current_user)
+
+
 ######## ADD ROLES ########
 
 
@@ -804,3 +873,5 @@ def display_employee():
   employees = Employee.query.all()
 
   return render_template('display_employee.html', employees=employees)
+
+

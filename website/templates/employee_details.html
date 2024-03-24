@@ -14,6 +14,7 @@
       <div class="container">
         <div class="row justify-content-end">
           <div class="col-auto">
+            <a  class="btn btn-warning btn-sm" href="{{ url_for('views.documents', employee_id=employee.employee_id) }}">View Documnets</a>
             <a  class="btn btn-info btn-sm" href="{{ url_for('views.edit_employee', employee_id=employee.employee_id) }}">Edit Details</a>
           </div>
         </div>

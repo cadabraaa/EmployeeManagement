@@ -38,7 +38,7 @@ class Employee(db.Model):
     careers = db.relationship('Career', backref='employee', lazy=True)
     army = db.relationship('Army', backref='employee', lazy=True)
     photo = db.relationship('Photo', backref='employee', lazy=True)
-    
+    documents = db.relationship('Documents', backref='employee', lazy=True)
 
 
 class Gender(db.Model, UserMixin):
@@ -85,6 +85,13 @@ class Family(db.Model, UserMixin):
   fullname = db.Column(db.String(150))
   relation = db.Column(db.String(50))
   birthdate = db.Column(db.Date)
+
+class Documents(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
+  document_type = db.Column(db.String(50))
+  document_name = db.Column(db.String(255))
+  document_path = db.Column(db.String(255))
   
 class Weapon(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
