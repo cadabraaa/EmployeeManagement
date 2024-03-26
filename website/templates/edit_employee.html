@@ -340,6 +340,35 @@
           </div>
       </div>
 
+          <!---Bank Details--->
+          <div id="bankDetails">
+            {% for bank in bankdetails %}
+            <div class="row bank-row">
+                <div class="col">
+                    <label for="bank_name_{{ bank.id }}">Bank Name:</label>
+                    <input type="text" class="form-control" id="bank_name_{{ bank.id }}" name="bank_name_{{ bank.id }}" value="{{ bank.bank_name }}">
+                </div>
+                <div class="col">
+                    <label for="bank_branch_{{ bank.id }}">Bank Branch:</label>
+                    <input type="text" class="form-control" id="bank_branch_{{ bank.id }}" name="bank_branch_{{ bank.id }}" value="{{ bank.bank_branch }}">
+                </div>
+                <div class="col">
+                    <label for="bank_account_number_{{ bank.id }}">Bank Account Number:</label>
+                    <input type="text" class="form-control" id="bank_account_number_{{ bank.id }}" name="bank_account_number_{{ bank.id }}" value="{{ bank.bank_account_number }}">
+                </div>
+                <div class="col">
+                    <label for="bank_ifsc_code_{{ bank.id }}">Bank IFSC Code:</label>
+                    <input type="text" class="form-control" id="bank_ifsc_code_{{ bank.id }}" name="bank_ifsc_code_{{ bank.id }}" value="{{ bank.bank_ifsc_code }}">
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-danger mt-2 delete-bank-detail" data-id="{{ bank.id }}">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+          </div>
+          <button type="button" id="addBankDetail" class="btn btn-info mt-3">Add More Bank Detail</button>
+          <input type="hidden" id="deleted_bankdetail_ids" name="deleted_bank_detail_ids" value="">
+
           </br>
           </br>
           <!-- Submit Button -->
@@ -571,6 +600,64 @@
             document.getElementById("addWeapon").addEventListener("click", addWeapon);
         });
         </script>
-      
+<!----bank--->
+       <!-- JavaScript -->
+       <script>
+           document.addEventListener("DOMContentLoaded", function() {
+               // Function to handle deleting bank details
+               function deleteBankDetail(event) {
+                   var bankId = event.target.dataset.id;
+                   var bankRow = event.target.closest(".bank-row");
+                   bankRow.parentNode.removeChild(bankRow);
+                   var deletedBankIdsInput = document.getElementById("deleted_bankdetail_ids");
+                   deletedBankIdsInput.value += bankId + ",";
+               }
+
+               // Add event listeners to all delete bank detail buttons
+               document.querySelectorAll(".delete-bank-detail").forEach(function(button) {
+                   button.addEventListener("click", deleteBankDetail);
+               });
+
+               // Function to handle adding new bank detail
+               function addBankDetail() {
+                   var bankDetailsContainer = document.getElementById("bankDetails");
+                   var timestamp = Date.now();
+                   var newBankRow = document.createElement('div');
+                   newBankRow.classList.add('row', 'bank-row');
+
+                   newBankRow.innerHTML = `
+                       <div class="col">
+                           <label for="bank_name_${timestamp}">Bank Name:</label>
+                           <input type="text" class="form-control" id="bank_name_${timestamp}" name="bank_name[]" value="">
+                       </div>
+                       <div class="col">
+                           <label for="bank_branch_${timestamp}">Bank Branch:</label>
+                           <input type="text" class="form-control" id="bank_branch_${timestamp}" name="bank_branch[]" value="">
+                       </div>
+                       <div class="col">
+                           <label for="bank_account_number_${timestamp}">Bank Account Number:</label>
+                           <input type="text" class="form-control" id="bank_account_number_${timestamp}" name="bank_account_number[]" value="">
+                       </div>
+                       <div class="col">
+                           <label for="bank_ifsc_code_${timestamp}">Bank IFSC Code:</label>
+                           <input type="text" class="form-control" id="bank_ifsc_code_${timestamp}" name="bank_ifsc_code[]" value="">
+                       </div>
+                       <div class="col">
+                           <button type="button" class="btn btn-danger mt-2 delete-bank-detail" data-id="${timestamp}">Delete</button>
+                       </div>
+                   `;
+
+                   bankDetailsContainer.appendChild(newBankRow);
+
+                   newBankRow.querySelector('.delete-bank-detail').addEventListener('click', deleteBankDetail);
+               }
+
+               // Add event listener to the add bank detail button
+               document.getElementById("addBankDetail").addEventListener("click", addBankDetail);
+           });
+       </script>
+
+   
+
          
 {% endblock %}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      crossorigin="anonymous"
+    />
+
+  </head>
+  <body>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="mb-3">
+          <h4>Employee ID: {{ employee.employee_id }}</h4>
+      </div>
+      <div class="row align-items-center">
+          <!-- Profile Picture -->
+          <div class="col-md-4 d-flex justify-content-center">
+              {% if static_file_path %}
+                  <img id="uploadedImage" src="{{ static_file_path }}" class="img-thumbnail" alt="" style="width: 100%;">
+              {% endif %}
+          </div>
+
+          <div class="col-md-8">
+              <div class="user-info" style="font-size: medium;">
+                
+                  <div class="row mb-3">
+                      <label for="name" class="col-sm-2 col-form-label">Full Name</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="name" value="{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}">
+                      </div>
+                  </div>
+                  <div class="row mb-3">
+                      <label for="designation" class="col-sm-2 col-form-label">Role</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="designation" value="{{ employee.role.role }}">
+                      </div>
+                  </div>
+                  <div class="row mb-3">
+                      <label for="gender" class="col-sm-2 col-form-label">Gender</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="gender" value="{{ employee.gender.gender }}">
+                      </div>
+                  </div>
+                  <div class="row mb-3">
+                      <label for="email" class="col-sm-2 col-form-label">Email</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="email" value="{{ employee.email }}">
+                      </div>
+                  </div>
+                  <div class="row mb-3">
+                      <label for="mobile" class="col-sm-2 col-form-label">Mobile</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="mobile" value="{{ employee.mobile }}">
+                      </div>
+                  </div>
+                  <!-- Add more fields here -->
+              </div>
+          </div>
+      </div>
+            <!-- User info -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4 class="card-title">More information</h4>
+                </div>
+
+              <div class="row">
+                  <div class="col">
+                      <label for="first_name" class="form-label">First Name</label>
+                      <input type="text" class="form-control" id="first_name" aria-label="First name">
+                  </div>
+                  <div class="col">
+                      <label for="last_name" class="form-label">Last Name</label>
+                      <input type="text" class="form-control" id="last_name" aria-label="Last name">
+                  </div>
+              </div>
+                <table class="table profile__table">
+                    <tbody>
+                        <tr>
+                            <th><strong>Birthdate</strong></th>
+                            <td>{{ employee.birthdate if employee.birthdate else "Pending" }}</td>
+                        </tr>
+                        <tr>
+                            <th><strong>Height (cm)</strong></th>
+                            <td>{{ employee.height if employee.height else "Pending" }}</td>
+                        </tr>
+                        <tr>
+                            <th><strong>Weight (kg)</strong></th>
+                            <td>{{ employee.weight if employee.weight else "Pending" }}</td>
+                        </tr>
+                        <tr>
+                            <th><strong>Marital Status</strong></th>
+                            <td>{{ employee.marital.marital if employee.marital else "Pending" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Education -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4 class="card-title">Identificaion Numbers</h4>
+                </div>
+                <table class="table profile__table">
+                    <tbody>
+                        <tr>
+                            <th><strong>Aadhar Number</strong></th>
+                            <td>{{ identification.aadhar if identification.aadhar else "Pending" }}</td>
+                        </tr>
+                        <tr>
+                            <th><strong>PAN</strong></th>
+                            <td>{{ identification.pan if identification.pan else "Pending" }}</td>
+                        </tr>
+                        <tr>
+                            <th><strong>Voter ID</strong></th>
+                            <td>{{ identification.voter if identification.voter else "Pending" }}</td>
+                        </tr>
+                        <tr>
+                            <th><strong>Driving License</strong></th>
+                            <td>{{ identification.dl if identification.dl else "Pending" }}</td>
+                        </tr>
+                        <tr>
+                            <th><strong>Passport Number</strong></th>
+                            <td>{{ identification.passport if identification.passport else "Pending" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Family -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4 class="card-title">Family</h4>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Relation</th>
+                            <th scope="col">Birthdate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in family %}
+                        <tr>
+                            <td>{{ member.fullname if member.fullname else 'Pending' }}</td>
+                            <td>{{ member.relation if member.relation else 'Pending' }}</td>
+                            <td>{{ member.birthdate if member.birthdate else 'Pending' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Address -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4 class="card-title">Address</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-dark">
+                                    <strong>Current Address</strong>
+                                </li>
+                                <li class="list-group-item">Address : {{ caddress.address_line1 if caddress.address_line1 else "Pending" }}</li>
+                                <li class="list-group-item">{{ caddress.street if caddress.street else "Pending" }}</li>
+                                <li class="list-group-item">{{ caddress.village if caddress.village else "Pending" }}</li>
+                                <li class="list-group-item">{{ caddress.pin if caddress.pin else "Pending" }}</li>
+                                <li class="list-group-item">{{ caddress.city.city if caddress.city else "Pending" }}</li>
+                                <li class="list-group-item">{{ caddress.state.state if caddress.state else "Pending" }}</li>
+                                <li class="list-group-item">{{ caddress.country.country if caddress.country else "Pending" }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-dark">
+                                    <strong>Permanent Address</strong>
+                                </li>
+                                <li class="list-group-item">Address : {{ paddress.address_line1 if paddress.address_line1 else "Pending" }}</li>
+                                <li class="list-group-item">{{ paddress.street if paddress.street else "Pending" }}</li>
+                                <li class="list-group-item">{{ paddress.village if paddress.village else "Pending" }}</li>
+                                <li class="list-group-item">{{ paddress.pin if paddress.pin else "Pending" }}</li>
+                                <li class="list-group-item">{{ paddress.city.city if paddress.city else "Pending" }}</li>
+                                <li class="list-group-item">{{ paddress.state.state if paddress.state else "Pending" }}</li>
+                                <li class="list-group-item">{{ paddress.country.country if paddress.country else "Pending" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          <!-- Education -->
+          <div class="card mb-3">
+              <div class="card-header">
+                  <h4 class="card-title">Education</h4>
+              </div>
+              <table class="table profile__table">
+                  <tbody>
+                      <tr>
+                          <th><strong>Highest Qualification</strong></th>
+                          <td>{{ employee.education.education if employee.education else "Pending" }}</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+          <!-- Weapon -->
+          <div class="card mb-3">
+              <div class="card-header">
+                  <h4 class="card-title">Weapon</h4>
+              </div>
+              <table class="table">
+                  <thead>
+                      <tr>
+                          <th scope="col">Weapon Type</th>
+                          <th scope="col">License Number</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% if not weapons %}
+                      <tr>
+                          <td colspan="2">Pending</td>
+                      </tr>
+                      {% else %}
+                      {% for weapon in weapons %}
+                      <tr>
+                          <td>{{ weapon.weapon }}</td>
+                          <td>{{ weapon.license }}</td>
+                      </tr>
+                      {% endfor %}
+                      {% endif %}
+                  </tbody>
+              </table>
+          </div>
+
+      <!-- Bank Details -->
+      <div class="card mb-3">
+          <div class="card-header">
+              <h4 class="card-title">Bank Details</h4>
+          </div>
+          <section class="py-5">
+              <ul class="timeline">
+                  {% for bank in bankdetails %}
+                  <li class="timeline-item mb-5">
+                      <h5 class="fw-bold">Bank Name : {{ bank.bank_name }}</h5>
+                      <p class="text-muted mb-2 fw-bold">Bank Branch : {{ bank.bank_branch }}</p>
+                      <p class="text-muted mb-2 fw-bold">Account Number : {{ bank.bank_account_number }}</p>
+                      <p class="text-muted mb-2 fw-bold">IFSC Code : {{ bank.bank_ifsc_code }}</p>
+                  </li>
+                  {% endfor %}
+              </ul>
+          </section>
+      </div>
+
+          <!-- Experience -->
+          <div class="card mb-3">
+              <div class="card-header">
+                  <h4 class="card-title">Experience</h4>
+              </div>
+              <section class="py-5">
+                  {% if not careers and not army %}
+                  <p>Pending</p>
+                  {% endif %}
+                  {% for career in careers %}
+                  <ul class="timeline">
+                      <li class="timeline-item mb-5">
+                          <h5 class="fw-bold">Company Name : {{ career.company }}</h5>
+                          <p class="text-muted mb-2 fw-bold">Joining Date : {{ career.joiningdate }}</p>
+                          <p class="text-muted mb-2 fw-bold">Leaving Date : {{ career.leavingdate }}</p>
+                      </li>
+                  </ul>
+                  {% endfor %}
+                  {% for army in army %}
+                  <ul class="timeline">
+                      <li class="timeline-item mb-5">
+                          <h5 class="fw-bold">Indian Defence Force : {{ army.force }}</h5>
+                          <p class="text-muted mb-2 fw-bold"> Joining Date : {{ army.joining }}</p>
+                          <p class="text-muted mb-2 fw-bold">Leaving Date : {{ army.leaving }}</p>
+                      </li>
+                  </ul>
+                  {% endfor %}
+              </section>
+          </div>
+
+
+    </div>
+  </div>
+</div>
+    <script
+          src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+          integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+          crossorigin="anonymous"
+        ></script>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+          integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+          crossorigin="anonymous"
+        ></script>
+        <script
+          src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+          integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+          crossorigin="anonymous"
+        ></script>
+
+
+      </body>  
+    </html>

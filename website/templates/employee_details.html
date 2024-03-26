@@ -14,6 +14,8 @@
       <div class="container">
         <div class="row justify-content-end">
           <div class="col-auto">
+            <a class="btn btn-success btn-sm" href="{{ url_for('views.employee_pdf', employee_id=employee.employee_id) }}">Generate PDF</a>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('views.idcard', employee_id=employee.employee_id) }}">ID Card</a>
             <a  class="btn btn-warning btn-sm" href="{{ url_for('views.documents', employee_id=employee.employee_id) }}">View Documnets</a>
             <a  class="btn btn-info btn-sm" href="{{ url_for('views.edit_employee', employee_id=employee.employee_id) }}">Edit Details</a>
           </div>
@@ -220,6 +222,25 @@
                     </table>
                 </div>
 
+            <!-- Bank Details -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4 class="card-title">Bank Details</h4>
+                </div>
+                <section class="py-5">
+                    <ul class="timeline">
+                        {% for bank in bankdetails %}
+                        <li class="timeline-item mb-5">
+                            <h5 class="fw-bold">Bank Name : {{ bank.bank_name }}</h5>
+                            <p class="text-muted mb-2 fw-bold">Bank Branch : {{ bank.bank_branch }}</p>
+                            <p class="text-muted mb-2 fw-bold">Account Number : {{ bank.bank_account_number }}</p>
+                            <p class="text-muted mb-2 fw-bold">IFSC Code : {{ bank.bank_ifsc_code }}</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+            
                 <!-- Experience -->
                 <div class="card mb-3">
                     <div class="card-header">

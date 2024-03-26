@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, make_response, render_template_string
 from flask_login import login_required, current_user
-from .models import Employee, Role, Gender, Education, Marital, Family, Country, State, City, Photo, Identification, Caddress, Paddress, Weapon, Career, Army, Documents
+from .models import Employee, Role, Gender, Education, Marital, Family, Country, State, City, Photo, Identification, Caddress, Paddress, Weapon, Career, Army, Documents, Bankdetails
 from flask_cors import CORS, cross_origin
 from . import db
 import os
@@ -11,7 +11,8 @@ import time
 from botocore.exceptions import ClientError
 import botocore
 import boto3
-import datetime
+import pdfkit
+
 
 views = Blueprint('views', __name__)
 CORS(views)
@@ -45,6 +46,7 @@ def employee():
   return render_template("employee.html", user=current_user)
 
 
+
 ######## VIEW EMPLOYEE ########
 
 
@@ -65,6 +67,8 @@ def employee_details(employee_id):
     careers = Career.query.filter_by(employee_id=employee.employee_id).all()
     army = Army.query.filter_by(employee_id=employee.employee_id).all()
     photo = Photo.query.filter_by(employee_id=employee.employee_id).first()
+    bankdetails = Bankdetails.query.filter_by(
+        employee_id=employee.employee_id)
 
     # If photo exists, construct static file path
     static_file_path = None
@@ -72,7 +76,6 @@ def employee_details(employee_id):
         static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{photo.stored_file_name}"
 
       
-
     return render_template("employee_details.html",
                            employee=employee,
                            identification=identification,
@@ -82,12 +85,66 @@ def employee_details(employee_id):
                            weapons=weapons,
                            careers=careers,
                            army=army,
+                           bankdetails=bankdetails,
                            photo=photo,
                            static_file_path=static_file_path,
                            user=current_user)
   else:
     flash('Employee not found.', category='error')
     return redirect(url_for('views.employee_list'))
+
+  
+####### EMPLOYEE PDF ########
+
+@views.route('/employee_pdf/<employee_id>', methods=['GET','POST'])
+@login_required
+@cross_origin()
+def employee_pdf(employee_id):
+  employee = Employee.query.filter_by(employee_id=employee_id).first()
+  return render_template("employee_pdf.html",
+                           employee=employee,
+                           user=current_user)
+
+@views.route('/employeeform/<employee_id>', methods=['GET','POST'])
+@login_required
+@cross_origin()
+def employeeform(employee_id):
+  employee = Employee.query.filter_by(employee_id=employee_id).first()
+  if employee:
+    identification = Identification.query.filter_by(
+        employee_id=employee.employee_id).first()
+    family = Family.query.filter_by(employee_id=employee.employee_id).all()
+    caddress = Caddress.query.filter_by(
+        employee_id=employee.employee_id).first()
+    paddress = Paddress.query.filter_by(
+        employee_id=employee.employee_id).first()
+    weapons = Weapon.query.filter_by(employee_id=employee.employee_id).all()
+    careers = Career.query.filter_by(employee_id=employee.employee_id).all()
+    army = Army.query.filter_by(employee_id=employee.employee_id).all()
+    photo = Photo.query.filter_by(employee_id=employee.employee_id).first()
+    bankdetails = Bankdetails.query.filter_by(
+        employee_id=employee.employee_id)
+
+    # If photo exists, construct static file path
+    static_file_path = None
+    if photo:
+        static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{photo.stored_file_name}"
+
+
+    return render_template("employeeform.html",
+                           employee=employee,
+                           identification=identification,
+                           family=family,
+                           caddress=caddress,
+                           paddress=paddress,
+                           weapons=weapons,
+                           careers=careers,
+                           army=army,
+                           bankdetails=bankdetails,
+                           photo=photo,
+                           static_file_path=static_file_path,
+                           user=current_user)
+
 
 
 ######## ADD EMPLOYEE ########
@@ -154,6 +211,10 @@ def add_employee():
     force = request.form.get('force')
     joining = request.form.get('joining')
     leaving = request.form.get('leaving')
+    bank_names = request.form.getlist('bank_name[]')
+    bank_branches = request.form.getlist('bank_branch[]')
+    bank_account_numbers = request.form.getlist('bank_account_number[]')
+    bank_ifsc_codes = request.form.getlist('bank_ifsc_code[]')
 
     if not first_name or not last_name or not email or not mobile:
       flash('All fields are required.', category='error')
@@ -198,6 +259,15 @@ def add_employee():
                                        birthdate=bdate,
                                        relation=relation)
             db.session.add(new_family_member)
+
+          # Add Bank Details
+          for bank_name, bank_branch, bank_account_number, bank_ifsc_code in zip(bank_names, bank_branches, bank_account_numbers, bank_ifsc_codes):
+              new_bank_detail = Bankdetails(employee_id=new_employee.employee_id,
+                                            bank_name=bank_name,
+                                            bank_branch=bank_branch,
+                                            bank_account_number=bank_account_number,
+                                            bank_ifsc_code=bank_ifsc_code)
+              db.session.add(new_bank_detail)
 
           # Add Carrer
           for company, cjoiningdate, cleavingdate in zip(
@@ -254,6 +324,8 @@ def add_employee():
                                   employee_id=new_employee.employee_id)
           db.session.add(new_paddress)
 
+          
+
           db.session.commit()
 
       except Exception as e:
@@ -298,6 +370,7 @@ def edit_employee(employee_id):
     careers = Career.query.filter_by(employee_id=employee_id).all()
     weapons = Weapon.query.filter_by(employee_id=employee_id).all()
     photo = Photo.query.filter_by(employee_id=employee_id).first()
+    bankdetails = Bankdetails.query.filter_by(employee_id=employee_id).all()
     
     # If photo exists, construct static file path
     static_file_path = None
@@ -352,7 +425,10 @@ def edit_employee(employee_id):
     force = request.form.get('force')
     joining = request.form.get('joining')
     leaving = request.form.get('leaving')
-    
+    bank_names = request.form.getlist('bank_name[]')
+    bank_branches = request.form.getlist('bank_branch[]')
+    bank_account_numbers = request.form.getlist('bank_account_number[]')
+    bank_ifsc_codes = request.form.getlist('bank_ifsc_code[]')
    
 
     if not first_name or not last_name or not email or not mobile:
@@ -418,6 +494,31 @@ def edit_employee(employee_id):
           member_to_delete = Family.query.get(member_id)
           if member_to_delete:
             db.session.delete(member_to_delete)
+
+
+        # Update existing bank details
+        for bank in bankdetails:
+          bank.bank_name = request.form.get(f'bankdetails_bank_name{bank.id}')
+          bank.bank_branch = request.form.get(f'bankdetails_bank_branch{bank.id}')
+          bank.bank_account_number = request.form.get(f'bankdetails_bank_account_number{bank.id}')
+          bank.bank_ifsc_code = request.form.get(f'bankdetails_bank_ifsc_code{bank.id}')
+          
+          
+        #  Create new Bank Details
+        for bank_name, bank_branch, bank_account_number, bank_ifsc_code in zip(bank_names, bank_branches, bank_account_numbers, bank_ifsc_codes):
+            new_bank_detail = Bankdetails(employee_id=new_employee.employee_id,
+                                          bank_name=bank_name,
+                                          bank_branch=bank_branch,
+                                          bank_account_number=bank_account_number,
+                                          bank_ifsc_code=bank_ifsc_code)
+            db.session.add(new_bank_detail)
+
+        # Delete bank details
+        deleted_bankdetail_ids = request.form.getlist('deleted_bankdetail_ids')
+        for bankdetail_id in deleted_bankdetail_ids:
+          bankdetail_to_delete = Bankdetails.query.get(bankdetail_id)
+          if bankdetail_to_delete:
+            db.session.delete(bankdetail_to_delete)
 
         # Update existing weapons
         for weapon in weapons:
@@ -527,6 +628,7 @@ def edit_employee(employee_id):
                          cities=cities,
                          roles=roles,
                          photo=photo,
+                         bankdetails=bankdetails,
                          current_user=current_user,
                          static_file_path=static_file_path,
                          user=current_user)
@@ -621,6 +723,50 @@ def upload(employee_id):
                          user=current_user)
 
 ######## ADD DOCUMENTS ########
+
+@views.route('/view_documents/<employee_id>', methods=['GET', 'POST'])
+@login_required
+@cross_origin()
+def view_documents(employee_id):
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    if not employee:
+        flash("Employee not found.")
+        return redirect(url_for('employee'))
+
+    documents = Documents.query.filter_by(employee_id=employee_id).all()
+
+    document_data = []
+    presigned_urls = {}
+    for document in documents:
+        document_entry = {'id': document.id, 'document_name': document.document_name}
+        document_data.append(document_entry)
+
+        try:
+            company_code = current_user.company_code
+            employee_folder = f"{company_code}/{employee_id}/"
+            file_path = os.path.join(employee_folder, document.document_name)
+
+            url = s3.generate_presigned_url('get_object',
+                                            Params={'Bucket': bucket_name, 'Key': file_path},
+                                            ExpiresIn=3600)  # URL expires in 1 hour, adjust as needed
+            presigned_urls[document.id] = url
+        except botocore.exceptions.ClientError as e:
+            flash(f"An error occurred while generating pre-signed URL for document ID {document.id}: {e}")
+
+    static_urls = []
+    for document in documents:
+        if document.document_path:
+            url = f"https://{bucket_name}.s3.amazonaws.com/{document.document_path}"
+            static_urls.append(url)
+        else:
+            flash(f"Document filepath is empty for document ID {document.id}. Skipping URL generation.")
+
+    return render_template('view_documents.html',
+                           employee=employee,
+                           documents=documents,
+                           static_urls=static_urls,
+                           presigned_urls=presigned_urls,
+                           user=current_user)
   
 
 @views.route('/documents/<employee_id>', methods=['GET', 'POST'])
@@ -633,6 +779,7 @@ def documents(employee_id):
         return redirect(url_for('employee'))
 
     documents = Documents.query.filter_by(employee_id=employee_id).all()
+
 
     document_data = []
     presigned_urls = {}
@@ -684,50 +831,78 @@ def upload_documents(employee_id):
         filename = request.form.get('filename', file.filename)
 
         if file.filename != '':
-            # Check if the file type is allowed
-            if get_file_type(file.filename) not in ALLOWED_FILE_TYPES:
-                flash("File type not allowed.")
-                return redirect(url_for('some_redirect_route'))
+          # Check if the file type is allowed
+          if get_file_type(file.filename) not in ALLOWED_FILE_TYPES:
+              flash("File type not allowed.")
+              return redirect(url_for('some_redirect_route'))
 
-            # Generate unique file name and employee folder path
-            company_code = current_user.company_code
-            employee_folder = f"{company_code}/{employee_id}/"
-            unique_filename = f"{filename}.{get_file_type(file.filename)}"
-            file_path = os.path.join(employee_folder, unique_filename)
+          # Generate unique file name and handle duplicates
+          original_filename = filename
+          index = 1
+          while True:
+              # Check if the filename already exists
+              existing_document = Documents.query.filter_by(employee_id=employee_id, document_name=filename).first()
+              if not existing_document:
+                  break
+              # If the filename exists, append a suffix
+              filename = f"{original_filename} ({index})"
+              index += 1
 
-            # Check if the company folder and employee folder exist, if not create them
+          # Generate unique file name and employee folder path
+          company_code = current_user.company_code
+          employee_folder = f"{company_code}/{employee_id}/"
+          unique_filename = f"{filename}.{get_file_type(file.filename)}"
+          file_path = os.path.join(employee_folder, unique_filename)
+
+          # Check if the company folder and employee folder exist, if not create them
+          try:
+              s3.head_object(Bucket=bucket_name, Key=employee_folder)
+          except ClientError as e:
+              if e.response['Error']['Code'] == '404':
+                  # Create company folder
+                  s3.put_object(Bucket=bucket_name, Key=company_code+'/')
+                  # Create employee folder
+                  s3.put_object(Bucket=bucket_name, Key=employee_folder)
+              else:
+                  flash("An error occurred while checking folder existence.")
+                  return redirect(url_for('views.documents', employee_id=employee_id))
+
+          # Upload the file to S3
+          try:
+              s3.upload_fileobj(file, bucket_name, file_path)
+
+              # Save document details to the database
+              document = Documents(employee_id=employee_id,
+                                   document_type=file.content_type,
+                                   document_name=filename,
+                                   document_path=file_path)
+              db.session.add(document)
+              db.session.commit()
+
+              # Flash success message
+              flash("File uploaded successfully!", category="success")
+              # Redirect to a GET route after successful upload
+              return redirect(url_for('views.documents', employee_id=employee_id))
+
+          except ClientError as e:
+              flash("An error occurred while uploading the file.")
+              return redirect(url_for('documents'))
+
+    # Handling document deletion
+    document_id_to_delete = request.form.get('delete_document')
+    if document_id_to_delete:
+        document_to_delete = Documents.query.get(document_id_to_delete)
+        if document_to_delete:
+            # Delete the document from S3
             try:
-                s3.head_object(Bucket=bucket_name, Key=employee_folder)
+                s3.delete_object(Bucket=bucket_name, Key=document_to_delete.document_path)
             except ClientError as e:
-                if e.response['Error']['Code'] == '404':
-                    # Create company folder
-                    s3.put_object(Bucket=bucket_name, Key=company_code+'/')
-                    # Create employee folder
-                    s3.put_object(Bucket=bucket_name, Key=employee_folder)
-                else:
-                    flash("An error occurred while checking folder existence.")
-                    return redirect(url_for('views.documents', employee_id=employee_id))
+                flash(f"An error occurred while deleting the document from S3: {e}")
+            # Delete the document from the database
+            db.session.delete(document_to_delete)
+            db.session.commit()
+            flash("Document deleted successfully.")
 
-            # Upload the file to S3
-            try:
-                s3.upload_fileobj(file, bucket_name, file_path)
-
-                # Save document details to the database
-                document = Documents(employee_id=employee_id,
-                                     document_type=file.content_type,
-                                     document_name=filename,
-                                     document_path=file_path)
-                db.session.add(document)
-                db.session.commit()
-
-                # Flash success message
-                flash("File uploaded successfully!", category="success")
-                # Redirect to a GET route after successful upload
-                return redirect(url_for('views.documents', employee_id=employee_id))
-
-            except ClientError as e:
-                flash("An error occurred while uploading the file.")
-                return redirect(url_for('documents'))
 
     # Fetch all documents for the employee
     documents = Documents.query.filter_by(employee_id=employee_id).all()
@@ -742,29 +917,27 @@ def upload_documents(employee_id):
                                                 ExpiresIn=31536000)  # URL expires in 1 hour, adjust as needed
                 presigned_urls[document.id] = url
             except ClientError as e:
-                flash(f"An error occurred while generating pre-signed URL for document ID {document.id}.")
-        else:
-            flash(f"Document name is empty for document ID {document.id}. Skipping URL generation.")
-          # Extract static paths from pre-signed URLs for documents
-    static_paths = []
-    for document in documents:
-        if document.file_path:
-            try:
-                url = s3.generate_presigned_url('get_object',
-                                                Params={'Bucket': bucket_name, 'Key': document.file_path},
-                                                ExpiresIn=31536000)  # URL expires in 1 year, adjust as needed
-                # Extract path from the URL
-                static_path = url.split(bucket_name + '/')[1]
-                static_paths.append(static_path)
-            except ClientError as e:
                 flash(f"An error occurred while generating pre-signed URL for document ID {document.id}: {e}")
         else:
-            flash(f"File path is empty for document ID {document.id}. Skipping URL extraction.")
+            flash(f"Document path is empty for document ID {document.id}. Skipping URL generation.")
+
+    static_urls = []
+    for document in documents:
+        if document.document_path:
+            url = f"https://{bucket_name}.s3.amazonaws.com/{document.document_path}"
+            static_urls.append(url)
+        else:
+            flash(f"Document filepath is empty for document ID {document.id}. Skipping URL generation.")
+    
+
     return render_template('documents.html',
                            employee=employee,
                            documents=documents,
                            presigned_urls=presigned_urls,
+                           static_urls=static_urls,
                            user=current_user)
+
+
 
 
 ######## ADD ROLES ########
@@ -875,3 +1048,48 @@ def display_employee():
   return render_template('display_employee.html', employees=employees)
 
 
+###### ID CARD ######
+
+@views.route('/idcard', methods=['GET', 'POST'])
+@login_required
+@cross_origin()
+def idcard():
+    employee_id = request.args.get('employee_id')  # Assuming you're passing employee_id as a query parameter
+    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    if employee:
+        identification = Identification.query.filter_by(
+            employee_id=employee.employee_id).first()
+        family = Family.query.filter_by(employee_id=employee.employee_id).all()
+        caddress = Caddress.query.filter_by(
+            employee_id=employee.employee_id).first()
+        paddress = Paddress.query.filter_by(
+            employee_id=employee.employee_id).first()
+        weapons = Weapon.query.filter_by(employee_id=employee.employee_id).all()
+        careers = Career.query.filter_by(employee_id=employee.employee_id).all()
+        army = Army.query.filter_by(employee_id=employee.employee_id).all()
+        photo = Photo.query.filter_by(employee_id=employee.employee_id).first()
+        bankdetails = Bankdetails.query.filter_by(
+            employee_id=employee.employee_id)
+
+        # If photo exists, construct static file path
+        static_file_path = None
+        if photo:
+            static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{photo.stored_file_name}"
+
+        return render_template("idcard.html",
+                               employee_id=employee_id,
+                               employee=employee,
+                               identification=identification,
+                               family=family,
+                               caddress=caddress,
+                               paddress=paddress,
+                               weapons=weapons,
+                               careers=careers,
+                               army=army,
+                               bankdetails=bankdetails,
+                               photo=photo,
+                               static_file_path=static_file_path,
+                               user=current_user)
+    else:
+        flash('Employee not found.', category='error')
+        return redirect(url_for('views.employee_list'))

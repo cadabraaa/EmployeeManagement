@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="container mt-4">
+        <!-- Print Button -->
+        <div class="mb-3 text-center">
+            <button class="print-btn btn btn-primary">Print</button>
+        </div>
+    </div>
+    <!-- Embed content in an iframe -->
+    <iframe id="print-frame" style="width: 100%; height: 600px; border: none;"
+            src="{{ url_for('views.employeeform', employee_id=employee.employee_id) }}">
+    </iframe>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.print-btn').click(function () {
+            var printFrame = document.getElementById('print-frame');
+            if (printFrame) {
+                printFrame.onload = function () {
+                    printFrame.contentWindow.print();
+                };
+            } else {
+                console.error("Print frame not found.");
+            }
+        });
+    });
+</script>
+{% endblock %}

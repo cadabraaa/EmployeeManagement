@@ -39,6 +39,16 @@ class Employee(db.Model):
     army = db.relationship('Army', backref='employee', lazy=True)
     photo = db.relationship('Photo', backref='employee', lazy=True)
     documents = db.relationship('Documents', backref='employee', lazy=True)
+    bankdetails = db.relationship('Bankdetails', backref='employee', lazy=True)
+
+
+class Bankdetails(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  bank_name = db.Column(db.String(150))
+  bank_branch = db.Column(db.String(150))
+  bank_account_number = db.Column(db.String(150))
+  bank_ifsc_code = db.Column(db.String(150))
+  employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
 
 
 class Gender(db.Model, UserMixin):
@@ -158,5 +168,7 @@ class City(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   city = db.Column(db.String(150), unique=True)
   state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
+
+
   
   

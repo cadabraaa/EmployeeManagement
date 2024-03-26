@@ -10,47 +10,33 @@
               {% endfor %}
           {% endif %}
       {% endwith %}
-      <div class="container mt-5">
-         <h2>Upload Documents</h2>
-        <form action="{{ url_for('views.upload_documents', employee_id=employee.employee_id) }}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <div id="filePreview" class="form-group">
-                <div id="previewPlaceholder" style="width: 100%; height: 200px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center;"></div>
+      <div class="container">
+        <div class="row justify-content-end">
+          <div class="col-auto">
+            <a  class="btn btn-warning btn" href="{{ url_for('views.documents', employee_id=employee.employee_id) }}">Edit/Add Document</a>
+            
+          </div>
+        </div>
+      </div>
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <h2>Document List</h2>
+                <ul class="list-group" id="documentList">
+                    {% for document in documents %}
+                        <li class="list-group-item document-item" data-url="{{ static_urls[loop.index0] }}">
+                            {{ document.document_name }}
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
-            <div class="form-group">
-                <input type="file" class="form-control-file" id="file" name="file" onchange="previewFile()" accept="image/*">
-                <label for="filename">Rename File <span class="text-danger">*</span>:</label>
-                <input type="text" class="form-control" id="filename" name="filename" placeholder="Enter new file name" required>
+            <div class="col-md-9">
+                <h2>Document Preview</h2>
+                <div class="preview" id="documentPreview">
+                    <p>Select a document from the list to preview it.</p>
+                </div>
             </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Upload</button>
-            </div>
-        </form>
-
-         <div class="row mt-4">
-             <div class="col-md-3">
-                 <h2>Document List</h2>
-                 <ul class="list-group" id="documentList">
-                     {% for document in documents %}
-                     <li class="list-group-item document-item d-flex justify-content-between" data-url="{{ static_urls[loop.index0] }}">
-                         <span>{{ document.document_name }}</span>
-                         <!-- Form for deleting a document -->
-                         <form action="{{ url_for('views.upload_documents', employee_id=employee.employee_id) }}" method="post">
-                             <input type="hidden" name="delete_document" value="{{ document.id }}">
-                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                         </form>
-                     </li>
-                     {% endfor %}
-                 </ul>
-             </div>
-             <div class="col-md-9">
-                 <h2>Document Preview</h2>
-                 <div class="preview" id="documentPreview">
-                     <p>Select a document from the list to preview it.</p>
-                 </div>
-             </div>
-         </div>
-
-     </div>
+        </div>
+      </div>
     </br>
     </br>
 
@@ -158,7 +144,7 @@
                color: #000000; /* Set the font color to black or your desired color */
            }
          </style>
-      
+
 
       <script>
           const documentItems = document.querySelectorAll('.document-item');
