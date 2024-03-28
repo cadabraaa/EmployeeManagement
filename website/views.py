@@ -101,8 +101,39 @@ def employee_details(employee_id):
 @cross_origin()
 def employee_pdf(employee_id):
   employee = Employee.query.filter_by(employee_id=employee_id).first()
-  return render_template("employee_pdf.html",
+  if employee:
+    identification = Identification.query.filter_by(
+        employee_id=employee.employee_id).first()
+    family = Family.query.filter_by(employee_id=employee.employee_id).all()
+    caddress = Caddress.query.filter_by(
+        employee_id=employee.employee_id).first()
+    paddress = Paddress.query.filter_by(
+        employee_id=employee.employee_id).first()
+    weapons = Weapon.query.filter_by(employee_id=employee.employee_id).all()
+    careers = Career.query.filter_by(employee_id=employee.employee_id).all()
+    army = Army.query.filter_by(employee_id=employee.employee_id).all()
+    photo = Photo.query.filter_by(employee_id=employee.employee_id).first()
+    bankdetails = Bankdetails.query.filter_by(
+        employee_id=employee.employee_id)
+
+    # If photo exists, construct static file path
+    static_file_path = None
+    if photo:
+        static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{photo.stored_file_name}"
+
+
+    return render_template("employee_pdf.html",
                            employee=employee,
+                           identification=identification,
+                           family=family,
+                           caddress=caddress,
+                           paddress=paddress,
+                           weapons=weapons,
+                           careers=careers,
+                           army=army,
+                           bankdetails=bankdetails,
+                           photo=photo,
+                           static_file_path=static_file_path,
                            user=current_user)
 
 @views.route('/employeeform/<employee_id>', methods=['GET','POST'])

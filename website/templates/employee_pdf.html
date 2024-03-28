@@ -1,40 +1,445 @@
-{% extends "base.html" %}
-{% block title %}Home{% endblock %}
-{% block content %}
-<div class="container mt-4">
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <div class="container mt-4">
-        <!-- Print Button -->
-        <div class="mb-3 text-center">
-            <button class="print-btn btn btn-primary">Print</button>
-        </div>
-    </div>
-    <!-- Embed content in an iframe -->
-    <iframe id="print-frame" style="width: 100%; height: 600px; border: none;"
-            src="{{ url_for('views.employeeform', employee_id=employee.employee_id) }}">
-    </iframe>
-</div>
+<!DOCTYPE html>
+<html>
+  <head> 
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      crossorigin="anonymous"
+    />
+    <style>
+     
+      .space {
+        height: 250px; /* Adjust the height as needed */
+      }
+      .custom-space {
+        height: 400px; /* Adjust the height as needed */
+      }
+      /* Set Times Roman font for specific elements */
+      label,  th, h1, h2, h3, h4, h5, h6 {
+        font-family: "Times New Roman", Times, serif;
+        font-weight: bold;
+        font-size: 1.1em; /* Adjust font size as needed */
+      }
+      
+    </style>
 
-<script>
+  </head>
+  <body>
+   <!-- Print Button -->
+    <div class="row mt-3">
+      <div class="col-md-12 text-center">
+        <button class="print-btn btn btn-primary">Print</button>
+      </div>
+    </div>
+  </br>
+  </br>
+    
+      
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="row align-items-center">
+            
+            <div class="container text-center border p-4">
+              <div class="row">
+                <div class="col-md-6 d-flex align-items-center">
+                  <img src="{{url_for('static', filename='logo.png')}}" class="rounded mr-3" alt="Logo">
+                  <h2 class="mb-0">{{ current_user.company_name }}</h2>
+                </div>
+              </div>
+            </div>
+          
+            <div class="space"></div>
+            
+              <!-- Profile Picture -->
+              <div class="col-md-4 d-flex justify-content-center">
+                  {% if static_file_path %}
+                      <img id="uploadedImage" src="{{ static_file_path }}" class="img-thumbnail" alt="" style="width: 250px;">
+                  {% endif %}
+              </div>
+
+
+              <div class="col-md-8">
+                  <div class="user-info" style="font-size: medium;">
+                    <div class="form-group">
+                      <label for="name">Employee ID</label>
+                      <input type="text" class="form-control" id="name" value="{{ employee.employee_id }}" disabled>
+                    </div>
+                      <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" class="form-control" id="name" value="{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}" disabled>
+                      </div>
+                      </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" value="{{ employee.email }}" disabled>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="mobile">Mobile</label>
+                        <input type="number" class="form-control" id="text"  value="{{ employee.mobile }}" disabled>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="gender">Gender</label>
+                        <input type="text" class="form-control" id="gender" value="{{ employee.gender.gender }}" disabled>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="role">Designamtion</label>
+                        <input type="text" class="form-control" id="text"  value="{{ employee.role }}" disabled>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+        
+        <div class="container">
+          <hr class="md-4">
+        </div>
+
+        <div class="col-12">
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label for="birthdate">Marital Status</label>
+              <input type="text" class="form-control" id="birthdate" value="{{ employee.marital.marital }}" disabled>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="birthdate">Birthdate</label>
+              <input type="text" class="form-control" id="birthdate" value="{{ employee.birthdate }}" disabled>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="height">Height (cm)</label>
+              <input type="text" class="form-control" id="height" value="{{ employee.height }}" disabled>
+            </div>
+            <div class="form-group col-md-3">
+              <label for="weight">Weight (kg)</label>
+              <input type="text" class="form-control" id="weight" value="{{ employee.weight}}" disabled >
+            </div>
+          </div>
+        </div>
+        
+        <!-- Identifications Numbers-->
+        <div class="container">
+          <hr class="md-4">
+          <h5>Government Identifications Numbers</h5>
+        </div>
+        
+        <div class="col-12">
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="aadhar">Aadhar Number</label>
+              <input type="text" class="form-control" id="aadhar" value="{{identification.aadhar}}" disabled>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="pan">PAN</label>
+              <input type="text" class="form-control" id="pan" value="{{ identification.pan }}" disabled>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="voterid">Voter ID</label>
+              <input type="text" class="form-control" id="voterid" value="{{identification.voter}}" disabled >
+            </div>
+            <div class="form-group col-md-4">
+              <label for="dl">Driving License</label>
+              <input type="text" class="form-control" id="dl" value="{{identification.dl}}" disabled>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="passport">Passport Number</label>
+              <input type="text" class="form-control" id="passport" value="{{ identification.passport }}" disabled>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="other">Other</label>
+              <input type="text" class="form-control" id="other" value="" disabled >
+            </div>
+          </div>
+        </div>
+        
+         <!-- Family -->
+        <div class="container">
+          <hr class="my-4">
+          <h5>Family Members</h5>
+        </div>
+
+                <table class="table table-bordered disabled-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Relation</th>
+                      <th scope="col">Birthdate</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for member in family %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ member.fullname }}</td>
+                        <td>{{ member.relation}}</td>
+                        <td>{{ member.birthdate }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+               
+        <!-- Weapon-->
+        <div class="container">
+          <hr class="my-4">
+          <h5>Weapon Details</h5>
+
+          <table class="table table-bordered disabled-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Weapon Type</th>
+                <th scope="col">Weapon License</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for weapon in weapons %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ weapon.weapon }}</td>
+                <td>{{ weapon.license}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </br>
+        <div class="custom-space"></div>
+                <!-- Address -->
+          <div class="container">
+            <hr class="my-4">
+            <h5>Address</h5>
+          </div>
+
+        
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <div class="row align-items-center">
+                  <div class="col-md-6 d-flex justify-content-center">
+                     <form>
+                       <p style="text-decoration: underline;">Current Address</p>
+                       <div class="form-group">
+                         <label for="address">Address Line 1</label>
+                         <input type="text" class="form-control" id="address" value="{{ caddress.address_line1 }}" disabled>
+                       </div>
+                       <div class="form-group">
+                         <label for="address">Address Line2</label>
+                         <input type="text" class="form-control" id="address" value="{{ caddress.street }}" disabled>
+                       </div>
+                       <div class="form-row">
+                         <div class="form-group col-md-6">
+                           <label for="city">City</label>
+                           <input type="text" class="form-control" id="city"value="{{ caddress.city.city }}" disabled>
+                         </div>
+                         <div class="form-group col-md-6">
+                             <label for="pin">PIN Code</label>
+                             <input type="text" class="form-control" id="pin" value="{{ caddress.pin }}" disabled>
+                           </div>
+                         </div>
+                       <div class="form-row">
+                       <div class="form-group col-md-6">
+                         <label for="state">State</label>
+                         <input type="text" class="form-control" id="state" value="{{ caddress.state.state }}" disabled>
+                       </div>
+                       <div class="form-group col-md-6">
+                           <label for="country">Country</label>
+                           <input type="text" class="form-control" id="country" value="{{ caddress.country.country }}" disabled>
+                         </div>
+                       </div>
+                     </form>
+                  </div>
+                
+                  <div class="col-md-6 d-flex justify-content-center">
+                     <form>
+                       <p style="text-decoration: underline;">Parmanent Address</p>
+                       <div class="form-group">
+                         <label for="address">Address Line 1</label>
+                         <input type="text" class="form-control" id="address" value="{{ paddress.address_line1 }}" disabled>
+                       </div>
+                       <div class="form-group">
+                         <label for="address">Address Line2</label>
+                         <input type="text" class="form-control" id="address" value="{{ paddress.street }}" disabled>
+                       </div>
+                       <div class="form-row">
+                         <div class="form-group col-md-6">
+                           <label for="city">City</label>
+                           <input type="text" class="form-control" id="city"value="{{ paddress.city.city }}" disabled>
+                         </div>
+                         <div class="form-group col-md-6">
+                             <label for="pin">PIN Code</label>
+                             <input type="text" class="form-control" id="pin" value="{{ paddress.pin }}" disabled>
+                           </div>
+                         </div>
+                       <div class="form-row">
+                       <div class="form-group col-md-6">
+                         <label for="state">State</label>
+                         <input type="text" class="form-control" id="state" value="{{ paddress.state.state }}" disabled>
+                       </div>
+                       <div class="form-group col-md-6">
+                           <label for="country">Country</label>
+                           <input type="text" class="form-control" id="country" value="{{ paddress.country.country }}" disabled>
+                         </div>
+                       </div>
+                     </form>
+                  </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      </div>
+      
+
+        
+       
+        <!-- Education -->
+          <div class="container">
+            <hr class="md-4">
+            <h5>Education Qualification and Experience</h5>
+          </div>
+
+          <div class="col-12">
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <label for="education">Highest Qualification</label>
+                <input type="text" class="form-control" id="education" value="{{employee.education.education}}" disabled>
+              </div>
+              <p>Served Indian Defence Service</p>
+              <table class="table table-bordered disabled-table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Indian Defence Force</th>
+                    <th scope="col">Joining Date</th>
+                    <th scope="col">Leaving Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for army in army %}
+                  <tr>
+                      <td>{{ loop.index }}</td>
+                      <td>{{ army.force }}</td>
+                      <td>{{ army.joining}}</td>
+                      <td>{{ army.leaving }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </br>
+              <p>Other Companies Served</p>
+              <table class="table table-bordered disabled-table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Company Name</th>
+                    <th scope="col">Joining Date</th>
+                    <th scope="col">Leaving Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for career in careers %}
+                  <tr>
+                      <td>{{ loop.index }}</td>
+                      <td>{{ career.company }}</td>
+                      <td>{{ career.joiningdate}}</td>
+                      <td>{{ career.leavingdate }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+      <!-- Education -->
+      <div class="container">
+        <hr class="md-4">
+        <h5>Declaration</h5>
+      </div>
+
+      <div>
+        <p>
+          I am ready to be posted in company's official position.</br>
+           I declare that, the above mentioned information is true to the best of my knowledge. 
+        </p>
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-4">
+            <h5>Place : </h5>
+          </div>
+          <div class="col-4">
+            <h5>Date : </h5>
+          </div>
+          <div class="col-4">
+            <h5>Checked By : </h5>
+          </div>
+          <div class="col-4">
+            <h5>Salary : </h5>
+          </div>
+          <div class="col-4">
+            
+          </div>
+          <div class="col-4">
+            <h5>Signature : </h5>
+            <div class="card custom-card">
+              <div class="card-body">
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+              
+      </div>
+        </div>
+      </div>
+  </div>
+  
+    <div class="space"></div>
+
+    </body> 
+   
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <style>
+    @media print {
+      .custom-navbar {
+        display: block !important; /* Ensure the navbar is displayed when printing */
+      }
+    }
+  </style>
+
+  <script>
     $(document).ready(function () {
-        $('.print-btn').click(function () {
-            var printFrame = document.getElementById('print-frame');
-            if (printFrame) {
-                printFrame.onload = function () {
-                    printFrame.contentWindow.print();
-                };
-            } else {
-                console.error("Print frame not found.");
-            }
-        });
+      $('.print-btn').click(function () {
+        // Hide the print button
+        $(this).hide();
+
+        // Print the page
+        window.print();
+
+        // Show the print button again after a delay (to ensure it's not printed)
+        setTimeout(function () {
+          $('.print-btn').show();
+        }, 1000); // Adjust the delay time as needed
+      });
     });
-</script>
-{% endblock %}
+  </script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </html>
+
+
+
