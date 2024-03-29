@@ -71,6 +71,14 @@
                     {% endfor %}
                 </select>
             </div>
+          <div class="form-group">
+              <label for="marital">Marital Status: <span style="color: red;">*</span></label>
+              <select class="form-control" id="marital" name="marital" required>
+                  {% for marital in maritals %}
+                      <option value="{{ marital.id }}" {% if employee.marital_id == marital.id %} selected {% endif %}>{{ marital.marital }}</option>
+                  {% endfor %}
+              </select>
+          </div>
             <div class="form-group">
                 <label for="email">Email: <span style="color: red;">*</span></label>
                 <input type="email" class="form-control" id="email" name="email" value="{{ employee.email }}" required>
@@ -165,18 +173,13 @@
           </div>
 
           <div class="form-group">
-              <label for="cstreet">Street:</label>
-              <input type="text" id="cstreet" name="cstreet" class="form-control" value="{{ caddress.street }}">
+              <label for="caddress_line2">Address Line 2:</label>
+              <input type="text" id="caddress_line2" name="caddress_line2" class="form-control" value="{{ caddress.address_line2 }}">
           </div>
 
           <div class="form-group">
               <label for="cpin">PIN:</label>
               <input type="text" id="cpin" name="cpin" class="form-control" value="{{ caddress.pin }}">
-          </div>
-
-          <div class="form-group">
-              <label for="cvillage">Village:</label>
-              <input type="text" id="cvillage" name="cvillage" class="form-control" value="{{ caddress.village }}">
           </div>
 
           <div class="form-group">
@@ -219,20 +222,15 @@
           </div>
 
           <div class="form-group">
-              <label for="pstreet">Street:</label>
-              <input type="text" id="pstreet" name="pstreet" class="form-control" value="{{ paddress.street }}">
+              <label for="paddress_line2">Address Line 2:</label>
+              <input type="text" id="paddress_line2" name="paddress_line2" class="form-control" value="{{ paddress.address_line2 }}">
           </div>
 
           <div class="form-group">
               <label for="ppin">PIN:</label>
               <input type="text" id="ppin" name="ppin" class="form-control" value="{{ paddress.pin }}">
           </div>
-
-          <div class="form-group">
-              <label for="pvillage">Village:</label>
-              <input type="text" id="pvillage" name="pvillage" class="form-control" value="{{ paddress.village }}">
-          </div>
-
+          
           <div class="form-group">
               <label for="pcity_id">City:</label>
               <select id="pcity_id" name="pcity_id" class="form-control">
@@ -341,35 +339,38 @@
       </div>
 
           <!---Bank Details--->
-          <div id="bankDetails">
-            {% for bank in bankdetails %}
-            <div class="row bank-row" data-bank-id="{{ bank.id }}">
+
+          {% for bank in bankdetails %}
+          <div class="row bank-row" data-id="{{ bank.id }}">
               <div class="col">
-                <label for="bankname_{{ bank.id }}">Bank Name:</label>
-                <input type="text" class="form-control bank_name" id="bankname_{{ bank.id }}" name="bankname_{{ bank.id }}" value="{{ bank.bankname }}">
+                  <label for="bankname_{{ bank.id }}">Bank Name:</label>
+                  <input type="text" class="form-control bankname" id="bankname_{{ bank.id }}" name="bankname_{{ bank.id }}" value="{{ bank.bankname }}">
               </div>
               <div class="col">
-                <label for="branch_{{ bank.id }}">Bank Branch:</label>
-                <input type="text" class="form-control branch" id="branch_{{ bank.id }}" name="branch_{{ bank.id }}" value="{{ bank.branch }}">
+                  <label for="branch_{{ bank.id }}">Bank Branch:</label>
+                  <input type="text" class="form-control branch" id="branch_{{ bank.id }}" name="branch_{{ bank.id }}" value="{{ bank.branch }}">
               </div>
               <div class="col">
-                <label for="account_{{ bank.id }}">Bank Account Number:</label>
-                <input type="text" class="form-control account" id="account_{{ bank.id }}" name="account_{{ bank.id }}" value="{{ bank.account }}">
+                  <label for="account_{{ bank.id }}">Bank Account Number:</label>
+                  <input type="text" class="form-control account" id="account_{{ bank.id }}" name="account_{{ bank.id }}" value="{{ bank.account }}">
               </div>
               <div class="col">
-                <label for="ifsc_{{ bank.id }}">Bank IFSC Code:</label>
-                <input type="text" class="form-control ifsc" id="ifsc_{{ bank.id }}" name="ifsc_{{ bank.id }}" value="{{ bank.ifsc }}">
+                  <label for="ifsc_{{ bank.id }}">Bank IFSC Code:</label>
+                  <input type="text" class="form-control ifsc" id="ifsc_{{ bank.id }}" name="ifsc_{{ bank.id }}" value="{{ bank.ifsc }}">
               </div>
               <div class="col">
-                <button type="button" class="btn btn-danger mt-2 delete-bankdetails" data-id="{{ bank.id }}">Delete</button>
+                  <button type="button" class="btn btn-danger delete-bankdetails" data-id="{{ bank.id }}">Delete</button>
               </div>
-            </div>
-            {% endfor %}
           </div>
+          {% endfor %}
 
-          <!-- Add More Bank Detail Button -->
-          <button type="button" id="addBankdetail" class="btn btn-info mt-3">Add More Bank Detail</button>
 
+          <div id="bankdetails">
+            <div class="bankdetails">
+                <!----New Bank Details---->
+            </div>
+          </div>
+          <button type="button" id="addBankdetails" class="btn btn-info mt-3">Add Bank</button>
           <!-- Hidden Input Field for Deleted Bank Details IDs -->
           <input type="hidden" id="deleted_bankdetails_ids" name="deleted_bankdetails_ids" value="">
 
@@ -411,18 +412,16 @@
                 if (this.checked) {
                     // Set permanent address fields to current address values
                     document.getElementById('paddress_line1').value = document.getElementById('caddress_line1').value;
-                    document.getElementById('pstreet').value = document.getElementById('cstreet').value;
+                    document.getElementById('paddress_line2').value = document.getElementById('caddress_line2').value;
                     document.getElementById('ppin').value = document.getElementById('cpin').value;
-                    document.getElementById('pvillage').value = document.getElementById('cvillage').value;
                     document.getElementById('pcity_id').value = document.getElementById('ccity_id').value;
                     document.getElementById('pstate_id').value = document.getElementById('cstate_id').value;
                     document.getElementById('pcountry_id').value = document.getElementById('ccountry_id').value;
                 } else {
                     // Clear permanent address fields
                     document.getElementById('paddress_line1').value = '';
-                    document.getElementById('pstreet').value = '';
+                    document.getElementById('paddress_line2').value = '';
                     document.getElementById('ppin').value = '';
-                    document.getElementById('pvillage').value = '';
                     document.getElementById('pcity_id').value = '';
                     document.getElementById('pstate_id').value = '';
                     document.getElementById('pcountry_id').value = '';
@@ -605,52 +604,39 @@
         });
         </script>
 <!----bank--->
-       <script>
-         // Function to add more bank details
-         document.getElementById("addBankdetail").addEventListener("click", function() {
-             var bankDetailsContainer = document.getElementById("bankDetails");
-             var newBankDetail = document.createElement("div");
-             newBankDetail.classList.add("row", "bank-row");
-             newBankDetail.innerHTML = `
-                 <div class="col">
-                     <label for="new_bankname">Bank Name:</label>
-                     <input type="text" class="form-control bank_name" name="new_bankname[]" value="">
-                 </div>
-                 <div class="col">
-                     <label for="new_branch">Bank Branch:</label>
-                     <input type="text" class="form-control branch" name="new_branch[]" value="">
-                 </div>
-                 <div class="col">
-                     <label for="new_account">Bank Account Number:</label>
-                     <input type="text" class="form-control account" name="new_account[]" value="">
-                 </div>
-                 <div class="col">
-                     <label for="new_ifsc">Bank IFSC Code:</label>
-                     <input type="text" class="form-control ifsc" name="new_ifsc[]" value="">
-                 </div>
-                 <div class="col">
-                     <button type="button" class="btn btn-danger mt-2 delete-new-bank-detail">Delete</button>
-                 </div>
-             `;
-             bankDetailsContainer.appendChild(newBankDetail);
-         });
+      </script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <script>
+          document.getElementById("addBankdetails").addEventListener("click", function() {
+              var bankDetailsContainer = document.getElementById("bankdetails");
+              var newBankDetail = document.createElement("div");
+              newBankDetail.classList.add("bankdetails");
+              newBankDetail.innerHTML = `
+                  <div class="form-row">
+                      <div class="col">
+                          <label for="bankname">Bank Name:</label>
+                          <input type="text" name="bankname[]" class="form-control">
+                      </div>
+                      <div class="col">
+                          <label for="branch">Bank Branch Name:</label>
+                          <input type="text" name="branch[]" class="form-control">
+                      </div>
+                      <div class="col">
+                          <label for="account">Bank Account Number:</label>
+                          <input type="text" name="account[]" class="form-control">
+                      </div>
+                      <div class="col">
+                          <label for="ifsc">Bank IFSC Code:</label>
+                          <input type="text" name="ifsc[]" class="form-control">
+                      </div>
+                  </div>
+              `;
+              bankDetailsContainer.appendChild(newBankDetail);
+          });
+      </script>
 
-         // Function to delete bank detail
-         document.addEventListener("click", function(event) {
-             if (event.target.classList.contains("delete-bankdetails")) {
-                 var bankId = event.target.dataset.id;
-                 var deletedBankDetailsIdsInput = document.getElementById("deleted_bankdetails_ids");
-                 var deletedBankDetailsIds = deletedBankDetailsIdsInput.value.split(',');
-                 deletedBankDetailsIds.push(bankId);
-                 deletedBankDetailsIdsInput.value = deletedBankDetailsIds.join(',');
-                 event.target.closest(".bank-row").remove();
-             }
-             if (event.target.classList.contains("delete-new-bank-detail")) {
-                 event.target.closest(".bank-row").remove();
-             }
-         });
 
-       </script>
+     
 
          
 {% endblock %}

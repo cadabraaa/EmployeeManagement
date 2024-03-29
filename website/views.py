@@ -218,16 +218,14 @@ def add_employee():
     passport = request.form.get('passport')
     dl = request.form.get('dl')
     caddress_line1 = request.form.get('caddress_line1')
-    cstreet = request.form.get('cstreet')
+    caddress_line2 = request.form.get('caddress_line2')
     cpin = request.form.get('cpin')
-    cvillage = request.form.get('cvillage')
     ccity_id = request.form.get('ccity_id')
     cstate_id = request.form.get('cstate_id')
     ccountry_id = request.form.get('ccountry_id')
     paddress_line1 = request.form.get('paddress_line1')
-    pstreet = request.form.get('pstreet')
+    paddress_line2 = request.form.get('paddress_line2')
     ppin = request.form.get('ppin')
-    pvillage = request.form.get('pvillage')
     pcity_id = request.form.get('pcity_id')
     pstate_id = request.form.get('pstate_id')
     pcountry_id = request.form.get('pcountry_id')
@@ -335,9 +333,8 @@ def add_employee():
 
           # Add current address
           new_caddress = Caddress(address_line1=caddress_line1,
-                                  street=cstreet,
+                                  address_line2=caddress_line2,
                                   pin=cpin,
-                                  village=cvillage,
                                   city_id=ccity_id,
                                   state_id=cstate_id,
                                   country_id=ccountry_id,
@@ -346,9 +343,8 @@ def add_employee():
 
           # Add permanent address
           new_paddress = Paddress(address_line1=paddress_line1,
-                                  street=pstreet,
+                                  address_line2=paddress_line2,
                                   pin=ppin,
-                                  village=pvillage,
                                   city_id=pcity_id,
                                   state_id=pstate_id,
                                   country_id=pcountry_id,
@@ -425,23 +421,21 @@ def edit_employee(employee_id):
     height = request.form.get('height')
     weight = request.form.get('weight')
     education_id = request.form.get('education')
-    marital_id = request.form.get('marital_id')
+    marital_id = request.form.get('marital')
     pan = request.form.get('pan')
     aadhar = request.form.get('aadhar')
     voter = request.form.get('voter')
     passport = request.form.get('passport')
     dl = request.form.get('dl')
     caddress_line1 = request.form.get('caddress_line1')
-    cstreet = request.form.get('cstreet')
+    caddress_line2 = request.form.get('caddress_line2')
     cpin = request.form.get('cpin')
-    cvillage = request.form.get('cvillage')
     ccity_id = request.form.get('ccity_id')
     cstate_id = request.form.get('cstate_id')
     ccountry_id = request.form.get('ccountry_id')
     paddress_line1 = request.form.get('paddress_line1')
-    pstreet = request.form.get('pstreet')
+    paddress_line2 = request.form.get('paddress_line2')
     ppin = request.form.get('ppin')
-    pvillage = request.form.get('pvillage')
     pcity_id = request.form.get('pcity_id')
     pstate_id = request.form.get('pstate_id')
     pcountry_id = request.form.get('pcountry_id')
@@ -456,10 +450,10 @@ def edit_employee(employee_id):
     force = request.form.get('force')
     joining = request.form.get('joining')
     leaving = request.form.get('leaving')
-    bank_names = request.form.getlist('bank_name[]')
-    bank_branches = request.form.getlist('bank_branch[]')
-    bank_account_numbers = request.form.getlist('bank_account_number[]')
-    bank_ifsc_codes = request.form.getlist('bank_ifsc_code[]')
+    bankname = request.form.getlist('bankname[]')
+    branch = request.form.getlist('branch[]')
+    account = request.form.getlist('account[]')
+    ifsc = request.form.getlist('ifsc[]')
 
 
     if not first_name or not last_name or not email or not mobile:
@@ -485,16 +479,14 @@ def edit_employee(employee_id):
         identification.passport = passport
         identification.dl = dl
         caddress.address_line1 = caddress_line1
-        caddress.street = cstreet
+        caddress.address_line2 = caddress_line2
         caddress.pin = cpin
-        caddress.village = cvillage
         caddress.city_id = ccity_id
         caddress.state_id = cstate_id
         caddress.country_id = ccountry_id
         paddress.address_line1 = paddress_line1
-        paddress.street = pstreet
+        paddress.address_line2 = paddress_line2
         paddress.pin = ppin
-        paddress.village = pvillage
         paddress.city_id = pcity_id
         paddress.state_id = pstate_id
         paddress.country_id = pcountry_id
@@ -529,20 +521,20 @@ def edit_employee(employee_id):
 
         # Update existing bank details
         for bank in bankdetails:
-          bank.bank_name = request.form.get(f'bankdetails_bank_name{bank.id}')
-          bank.bank_branch = request.form.get(f'bankdetails_bank_branch{bank.id}')
-          bank.bank_account_number = request.form.get(f'bankdetails_bank_account_number{bank.id}')
-          bank.bank_ifsc_code = request.form.get(f'bankdetails_bank_ifsc_code{bank.id}')
+          bank.bankname = request.form.get(f'bankdetails_bankname{bank.id}')
+          bank.branch = request.form.get(f'bankdetails_branch{bank.id}')
+          bank.account = request.form.get(f'bankdetails_account{bank.id}')
+          bank.ifsc = request.form.get(f'bankdetails_ifsc{bank.id}')
 
 
         #  Create new Bank Details
-        for bank_name, bank_branch, bank_account_number, bank_ifsc_code in zip(bank_names, bank_branches, bank_account_numbers, bank_ifsc_codes):
-            new_bank_detail = Bankdetails(employee_id=new_employee.employee_id,
-                                          bank_name=bank_name,
-                                          bank_branch=bank_branch,
-                                          bank_account_number=bank_account_number,
-                                          bank_ifsc_code=bank_ifsc_code)
-            db.session.add(new_bank_detail)
+        for bankname, branch, account, ifsc in zip(bankname, branch, account, ifsc):
+            new_bankdetails = Bankdetails(employee_id=employee.employee_id,
+                                          bankname=bankname,
+                                          branch=branch,
+                                          account=account,
+                                          ifsc=ifsc)
+            db.session.add(new_bankdetails)
 
         # Delete bank details
         deleted_bankdetail_ids = request.form.getlist('deleted_bankdetail_ids')

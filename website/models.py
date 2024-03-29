@@ -127,9 +127,8 @@ class Army(db.Model, UserMixin):
 class Caddress(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   address_line1 = db.Column(db.String(255))
-  street = db.Column(db.String(100))
+  address_line2 = db.Column(db.String(255))
   pin = db.Column(db.BigInteger)
-  village = db.Column(db.String(100))
   city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
   state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
   country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
@@ -141,9 +140,8 @@ class Caddress(db.Model, UserMixin):
 class Paddress(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   address_line1 = db.Column(db.String(255))
-  street = db.Column(db.String(100))
+  address_line2 = db.Column(db.String(255))
   pin = db.Column(db.BigInteger)
-  village = db.Column(db.String(100))
   city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
   state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
   country_id = db.Column(db.Integer, db.ForeignKey('country.id'))

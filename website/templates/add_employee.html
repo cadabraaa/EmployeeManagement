@@ -200,18 +200,13 @@
             </div>
 
             <div class="form-group">
-                <label for="cstreet">Street:</label>
-                <input type="text" id="cstreet" name="cstreet" class="form-control">
+                <label for="caddress_line2">Address Line2:</label>
+                <input type="text" id="caddress_line2" name="caddress_line2" class="form-control">
             </div>
 
             <div class="form-group">
                 <label for="cpin">PIN:</label>
                 <input type="text" id="cpin" name="cpin" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label for="cvillage">Village:</label>
-                <input type="text" id="cvillage" name="cvillage" class="form-control">
             </div>
 
             <div class="form-group">
@@ -256,18 +251,13 @@
             </div>
 
             <div class="form-group">
-                <label for="pstreet">Street:</label>
-                <input type="text" id="pstreet" name="pstreet" class="form-control">
+                <label for="paddress_line2">Address Line 2:</label>
+                <input type="text" id="paddress_line2" name="paddress_line2" class="form-control">
             </div>
 
             <div class="form-group">
                 <label for="ppin">PIN:</label>
                 <input type="text" id="ppin" name="ppin" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label for="pvillage">Village:</label>
-                <input type="text" id="pvillage" name="pvillage" class="form-control">
             </div>
 
             <div class="form-group">
@@ -393,18 +383,16 @@
                   if (this.checked) {
                       // Set permanent address fields to current address values
                       document.getElementById('paddress_line1').value = document.getElementById('caddress_line1').value;
-                      document.getElementById('pstreet').value = document.getElementById('cstreet').value;
+                      document.getElementById('paddress_line2').value = document.getElementById('caddress_line2').value;
                       document.getElementById('ppin').value = document.getElementById('cpin').value;
-                      document.getElementById('pvillage').value = document.getElementById('cvillage').value;
                       document.getElementById('pcity_id').value = document.getElementById('ccity_id').value;
                       document.getElementById('pstate_id').value = document.getElementById('cstate_id').value;
                       document.getElementById('pcountry_id').value = document.getElementById('ccountry_id').value;
                   } else {
                       // Clear permanent address fields
                       document.getElementById('paddress_line1').value = '';
-                      document.getElementById('pstreet').value = '';
+                      document.getElementById('paddress_line2').value = '';
                       document.getElementById('ppin').value = '';
-                      document.getElementById('pvillage').value = '';
                       document.getElementById('pcity_id').value = '';
                       document.getElementById('pstate_id').value = '';
                       document.getElementById('pcountry_id').value = '';

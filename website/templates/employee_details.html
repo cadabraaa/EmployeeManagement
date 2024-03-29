@@ -153,8 +153,7 @@
                                           <strong>Current Address</strong>
                                       </li>
                                       <li class="list-group-item">Address : {{ caddress.address_line1 if caddress.address_line1 else "Pending" }}</li>
-                                      <li class="list-group-item">{{ caddress.street if caddress.street else "Pending" }}</li>
-                                      <li class="list-group-item">{{ caddress.village if caddress.village else "Pending" }}</li>
+                                      <li class="list-group-item">{{ caddress.address_line2 if caddress.address_line2 else "Pending" }}</li>
                                       <li class="list-group-item">{{ caddress.pin if caddress.pin else "Pending" }}</li>
                                       <li class="list-group-item">{{ caddress.city.city if caddress.city else "Pending" }}</li>
                                       <li class="list-group-item">{{ caddress.state.state if caddress.state else "Pending" }}</li>
@@ -167,8 +166,7 @@
                                           <strong>Permanent Address</strong>
                                       </li>
                                       <li class="list-group-item">Address : {{ paddress.address_line1 if paddress.address_line1 else "Pending" }}</li>
-                                      <li class="list-group-item">{{ paddress.street if paddress.street else "Pending" }}</li>
-                                      <li class="list-group-item">{{ paddress.village if paddress.village else "Pending" }}</li>
+                                      <li class="list-group-item">{{ paddress.address_line2 if paddress.address_line2 else "Pending" }}</li>
                                       <li class="list-group-item">{{ paddress.pin if paddress.pin else "Pending" }}</li>
                                       <li class="list-group-item">{{ paddress.city.city if paddress.city else "Pending" }}</li>
                                       <li class="list-group-item">{{ paddress.state.state if paddress.state else "Pending" }}</li>
