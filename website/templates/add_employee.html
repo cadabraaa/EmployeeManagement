@@ -120,31 +120,31 @@
           </br>
           <div>
 
-            <form id="bankDetailsForm" action="/add_employee" method="post">
-                <div id="bankDetails">
+            
+                <div id="bankdetails">
                     <div class="bankdetails">
                         <div class="form-row">
                             <div class="col">
-                                <label for="bank_name">Bank Name:</label>
-                                <input type="text" name="bank_name[]" class="form-control">
+                                <label for="bankname">Bank Name:</label>
+                                <input type="text" name="bankname[]" class="form-control">
                             </div>
                             <div class="col">
-                                <label for="bank_branch">Bank Branch Name:</label>
-                                <input type="text" name="bank_branch[]" class="form-control">
+                                <label for="branch">Bank Branch Name:</label>
+                                <input type="text" name="branch[]" class="form-control">
                             </div>
                             <div class="col">
-                                <label for="bank_account_number">Bank Account Number:</label>
-                                <input type="text" name="bank_account_number[]" class="form-control">
+                                <label for="account">Bank Account Number:</label>
+                                <input type="text" name="account[]" class="form-control">
                             </div>
                             <div class="col">
-                                <label for="bank_ifsc_code">Bank IFSC Code:</label>
-                                <input type="text" name="bank_ifsc_code[]" class="form-control">
+                                <label for="ifsc">Bank IFSC Code:</label>
+                                <input type="text" name="ifsc[]" class="form-control">
                             </div>
                         </div>
                     </div>
                 </div>
-                <button type="button" id="addBankDetails" class="btn btn-info mt-3">Add More</button>
-            </form>
+                <button type="button" id="addBankdetails" class="btn btn-info mt-3">Add More</button>
+            
             </br>
             </br>
             <div>
@@ -455,11 +455,31 @@
           </script>
               <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
               <script>
-                  $(document).ready(function () {
-                      $("#addBankDetails").click(function () {
-                          $("#bankDetails").append(
-                            '<div class="bankdetails"><div class="form-row"><div class="col"><label for="bank_name">Bank Name:</label><input type="text" name="bank_name[]" class="form-control"></div><div class="col"><label for="bank_branch">Bank Branch Name:</label><input type="text" name="bank_branch[]" class="form-control"></div><div class="col"><label for="bank_account_number">Bank Account Number:</label><input type="text" name="bank_account_number[]" class="form-control"></div><div class="col"><label for="bank_ifsc_code">Bank IFSC Code:</label><input type="text" name="bank_ifsc_code[]" class="form-control"></div></div></div>');
-                      });
+                  document.getElementById("addBankdetails").addEventListener("click", function() {
+                      var bankDetailsContainer = document.getElementById("bankdetails");
+                      var newBankDetail = document.createElement("div");
+                      newBankDetail.classList.add("bankdetails");
+                      newBankDetail.innerHTML = `
+                          <div class="form-row">
+                              <div class="col">
+                                  <label for="bankname">Bank Name:</label>
+                                  <input type="text" name="bankname[]" class="form-control">
+                              </div>
+                              <div class="col">
+                                  <label for="branch">Bank Branch Name:</label>
+                                  <input type="text" name="branch[]" class="form-control">
+                              </div>
+                              <div class="col">
+                                  <label for="account">Bank Account Number:</label>
+                                  <input type="text" name="account[]" class="form-control">
+                              </div>
+                              <div class="col">
+                                  <label for="ifsc">Bank IFSC Code:</label>
+                                  <input type="text" name="ifsc[]" class="form-control">
+                              </div>
+                          </div>
+                      `;
+                      bankDetailsContainer.appendChild(newBankDetail);
                   });
               </script>
          

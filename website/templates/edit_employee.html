@@ -15,34 +15,34 @@
           <h1>Edit Employee</h1>
         <div class="container">
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="text-center">
-                            <div class="profile-userpic">
-                                {% if static_file_path %}
-                                    <img id="uploadedImage" src="{{ static_file_path }}" class="img-responsive" alt="" style="width: 100%;">
-                                {% endif %}
-                            </div>
-                            <form action="{{ url_for('views.upload', employee_id=employee.employee_id) }}" method="post" enctype="multipart/form-data">
-                                <div class="form-group mt-3">
-                                    <input type="file" class="form-control-file" id="exampleInputFile" name="file" accept="image/*"> 
-                                </div>
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="submit">Upload</button>
-                                </div>
-                            </form>
+              <div class="card">
+                  <div class="card-body">
+                      <div class="text-center">
+                          <div class="profile-userpic">
+                              {% if static_file_path %}
+                                  <img id="uploadedImage" src="{{ static_file_path }}" class="img-responsive" alt="" style="width: 100%;">
+                              {% endif %}
+                          </div>
+                          <form action="{{ url_for('views.upload', employee_id=employee.employee_id) }}" method="post" enctype="multipart/form-data">
+                              <div class="form-group mt-3">
+                                  <input type="file" class="form-control-file" id="exampleInputFile" name="file" accept="image/*"> 
+                              </div>
+                              <div class="input-group-append">
+                                  <button class="btn btn-primary" type="submit">Upload</button>
+                              </div>
+                          </form>
 
-                        </div>
-                    </div>
+                      </div>
+                  </div>
 
-                </div>
+            </div>
             </div>
         </div>
 
 
        </div>
 
-        <form method="POST" >
+        <form method="POST">
             <div class="form-group">
                 <label for="first_name">First Name: <span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="first_name" name="first_name" value="{{ employee.first_name }}" required>
@@ -343,31 +343,35 @@
           <!---Bank Details--->
           <div id="bankDetails">
             {% for bank in bankdetails %}
-            <div class="row bank-row">
-                <div class="col">
-                    <label for="bank_name_{{ bank.id }}">Bank Name:</label>
-                    <input type="text" class="form-control" id="bank_name_{{ bank.id }}" name="bank_name_{{ bank.id }}" value="{{ bank.bank_name }}">
-                </div>
-                <div class="col">
-                    <label for="bank_branch_{{ bank.id }}">Bank Branch:</label>
-                    <input type="text" class="form-control" id="bank_branch_{{ bank.id }}" name="bank_branch_{{ bank.id }}" value="{{ bank.bank_branch }}">
-                </div>
-                <div class="col">
-                    <label for="bank_account_number_{{ bank.id }}">Bank Account Number:</label>
-                    <input type="text" class="form-control" id="bank_account_number_{{ bank.id }}" name="bank_account_number_{{ bank.id }}" value="{{ bank.bank_account_number }}">
-                </div>
-                <div class="col">
-                    <label for="bank_ifsc_code_{{ bank.id }}">Bank IFSC Code:</label>
-                    <input type="text" class="form-control" id="bank_ifsc_code_{{ bank.id }}" name="bank_ifsc_code_{{ bank.id }}" value="{{ bank.bank_ifsc_code }}">
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger mt-2 delete-bank-detail" data-id="{{ bank.id }}">Delete</button>
-                </div>
+            <div class="row bank-row" data-bank-id="{{ bank.id }}">
+              <div class="col">
+                <label for="bankname_{{ bank.id }}">Bank Name:</label>
+                <input type="text" class="form-control bank_name" id="bankname_{{ bank.id }}" name="bankname_{{ bank.id }}" value="{{ bank.bankname }}">
+              </div>
+              <div class="col">
+                <label for="branch_{{ bank.id }}">Bank Branch:</label>
+                <input type="text" class="form-control branch" id="branch_{{ bank.id }}" name="branch_{{ bank.id }}" value="{{ bank.branch }}">
+              </div>
+              <div class="col">
+                <label for="account_{{ bank.id }}">Bank Account Number:</label>
+                <input type="text" class="form-control account" id="account_{{ bank.id }}" name="account_{{ bank.id }}" value="{{ bank.account }}">
+              </div>
+              <div class="col">
+                <label for="ifsc_{{ bank.id }}">Bank IFSC Code:</label>
+                <input type="text" class="form-control ifsc" id="ifsc_{{ bank.id }}" name="ifsc_{{ bank.id }}" value="{{ bank.ifsc }}">
+              </div>
+              <div class="col">
+                <button type="button" class="btn btn-danger mt-2 delete-bankdetails" data-id="{{ bank.id }}">Delete</button>
+              </div>
             </div>
             {% endfor %}
           </div>
-          <button type="button" id="addBankDetail" class="btn btn-info mt-3">Add More Bank Detail</button>
-          <input type="hidden" id="deleted_bankdetail_ids" name="deleted_bank_detail_ids" value="">
+
+          <!-- Add More Bank Detail Button -->
+          <button type="button" id="addBankdetail" class="btn btn-info mt-3">Add More Bank Detail</button>
+
+          <!-- Hidden Input Field for Deleted Bank Details IDs -->
+          <input type="hidden" id="deleted_bankdetails_ids" name="deleted_bankdetails_ids" value="">
 
           </br>
           </br>
@@ -388,20 +392,20 @@
 
 
 
-        <script>
-           document.addEventListener('DOMContentLoaded', function() {
-             document.getElementById('exampleInputFile').addEventListener('change', function() {
-               const file = this.files[0];
-               if (file) {
-                 const reader = new FileReader();
-                 reader.onload = function(event) {
-                   document.getElementById('uploadedImage').src = event.target.result;
-                 }
-                 reader.readAsDataURL(file);
-               }
-             });
-           });
-         </script>
+       <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('exampleInputFile').addEventListener('change', function() {
+              const file = this.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                  document.getElementById('uploadedImage').src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+              }
+            });
+          });
+        </script>
         <script>
             document.getElementById('sameAddress').addEventListener('change', function() {
                 if (this.checked) {
@@ -601,63 +605,52 @@
         });
         </script>
 <!----bank--->
-       <!-- JavaScript -->
        <script>
-           document.addEventListener("DOMContentLoaded", function() {
-               // Function to handle deleting bank details
-               function deleteBankDetail(event) {
-                   var bankId = event.target.dataset.id;
-                   var bankRow = event.target.closest(".bank-row");
-                   bankRow.parentNode.removeChild(bankRow);
-                   var deletedBankIdsInput = document.getElementById("deleted_bankdetail_ids");
-                   deletedBankIdsInput.value += bankId + ",";
-               }
+         // Function to add more bank details
+         document.getElementById("addBankdetail").addEventListener("click", function() {
+             var bankDetailsContainer = document.getElementById("bankDetails");
+             var newBankDetail = document.createElement("div");
+             newBankDetail.classList.add("row", "bank-row");
+             newBankDetail.innerHTML = `
+                 <div class="col">
+                     <label for="new_bankname">Bank Name:</label>
+                     <input type="text" class="form-control bank_name" name="new_bankname[]" value="">
+                 </div>
+                 <div class="col">
+                     <label for="new_branch">Bank Branch:</label>
+                     <input type="text" class="form-control branch" name="new_branch[]" value="">
+                 </div>
+                 <div class="col">
+                     <label for="new_account">Bank Account Number:</label>
+                     <input type="text" class="form-control account" name="new_account[]" value="">
+                 </div>
+                 <div class="col">
+                     <label for="new_ifsc">Bank IFSC Code:</label>
+                     <input type="text" class="form-control ifsc" name="new_ifsc[]" value="">
+                 </div>
+                 <div class="col">
+                     <button type="button" class="btn btn-danger mt-2 delete-new-bank-detail">Delete</button>
+                 </div>
+             `;
+             bankDetailsContainer.appendChild(newBankDetail);
+         });
 
-               // Add event listeners to all delete bank detail buttons
-               document.querySelectorAll(".delete-bank-detail").forEach(function(button) {
-                   button.addEventListener("click", deleteBankDetail);
-               });
+         // Function to delete bank detail
+         document.addEventListener("click", function(event) {
+             if (event.target.classList.contains("delete-bankdetails")) {
+                 var bankId = event.target.dataset.id;
+                 var deletedBankDetailsIdsInput = document.getElementById("deleted_bankdetails_ids");
+                 var deletedBankDetailsIds = deletedBankDetailsIdsInput.value.split(',');
+                 deletedBankDetailsIds.push(bankId);
+                 deletedBankDetailsIdsInput.value = deletedBankDetailsIds.join(',');
+                 event.target.closest(".bank-row").remove();
+             }
+             if (event.target.classList.contains("delete-new-bank-detail")) {
+                 event.target.closest(".bank-row").remove();
+             }
+         });
 
-               // Function to handle adding new bank detail
-               function addBankDetail() {
-                   var bankDetailsContainer = document.getElementById("bankDetails");
-                   var timestamp = Date.now();
-                   var newBankRow = document.createElement('div');
-                   newBankRow.classList.add('row', 'bank-row');
-
-                   newBankRow.innerHTML = `
-                       <div class="col">
-                           <label for="bank_name_${timestamp}">Bank Name:</label>
-                           <input type="text" class="form-control" id="bank_name_${timestamp}" name="bank_name[]" value="">
-                       </div>
-                       <div class="col">
-                           <label for="bank_branch_${timestamp}">Bank Branch:</label>
-                           <input type="text" class="form-control" id="bank_branch_${timestamp}" name="bank_branch[]" value="">
-                       </div>
-                       <div class="col">
-                           <label for="bank_account_number_${timestamp}">Bank Account Number:</label>
-                           <input type="text" class="form-control" id="bank_account_number_${timestamp}" name="bank_account_number[]" value="">
-                       </div>
-                       <div class="col">
-                           <label for="bank_ifsc_code_${timestamp}">Bank IFSC Code:</label>
-                           <input type="text" class="form-control" id="bank_ifsc_code_${timestamp}" name="bank_ifsc_code[]" value="">
-                       </div>
-                       <div class="col">
-                           <button type="button" class="btn btn-danger mt-2 delete-bank-detail" data-id="${timestamp}">Delete</button>
-                       </div>
-                   `;
-
-                   bankDetailsContainer.appendChild(newBankRow);
-
-                   newBankRow.querySelector('.delete-bank-detail').addEventListener('click', deleteBankDetail);
-               }
-
-               // Add event listener to the add bank detail button
-               document.getElementById("addBankDetail").addEventListener("click", addBankDetail);
-           });
        </script>
-
-   
 
          
 {% endblock %}

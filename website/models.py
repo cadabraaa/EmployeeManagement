@@ -44,10 +44,10 @@ class Employee(db.Model):
 
 class Bankdetails(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
-  bank_name = db.Column(db.String(150))
-  bank_branch = db.Column(db.String(150))
-  bank_account_number = db.Column(db.String(150))
-  bank_ifsc_code = db.Column(db.String(150))
+  bankname = db.Column(db.String(150))
+  branch = db.Column(db.String(150))
+  account = db.Column(db.String(150))
+  ifsc = db.Column(db.String(150))
   employee_id = db.Column(db.String(15), db.ForeignKey('employee.employee_id'))
 
 

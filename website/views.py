@@ -242,10 +242,10 @@ def add_employee():
     force = request.form.get('force')
     joining = request.form.get('joining')
     leaving = request.form.get('leaving')
-    bank_names = request.form.getlist('bank_name[]')
-    bank_branches = request.form.getlist('bank_branch[]')
-    bank_account_numbers = request.form.getlist('bank_account_number[]')
-    bank_ifsc_codes = request.form.getlist('bank_ifsc_code[]')
+    bankname = request.form.getlist('bankname[]')
+    branch = request.form.getlist('branch[]')
+    account = request.form.getlist('account[]')
+    ifsc = request.form.getlist('ifsc[]')
 
     if not first_name or not last_name or not email or not mobile:
       flash('All fields are required.', category='error')
@@ -292,13 +292,13 @@ def add_employee():
             db.session.add(new_family_member)
 
           # Add Bank Details
-          for bank_name, bank_branch, bank_account_number, bank_ifsc_code in zip(bank_names, bank_branches, bank_account_numbers, bank_ifsc_codes):
-              new_bank_detail = Bankdetails(employee_id=new_employee.employee_id,
-                                            bank_name=bank_name,
-                                            bank_branch=bank_branch,
-                                            bank_account_number=bank_account_number,
-                                            bank_ifsc_code=bank_ifsc_code)
-              db.session.add(new_bank_detail)
+          for bankname, branch, account, ifsc in zip(bankname, branch, account, ifsc):
+              new_bankdetails = Bankdetails(employee_id=new_employee.employee_id,
+                                            bankname=bankname,
+                                            branch=branch,
+                                            account=account,
+                                            ifsc=ifsc)
+              db.session.add(new_bankdetails)
 
           # Add Carrer
           for company, cjoiningdate, cleavingdate in zip(
@@ -402,13 +402,13 @@ def edit_employee(employee_id):
     weapons = Weapon.query.filter_by(employee_id=employee_id).all()
     photo = Photo.query.filter_by(employee_id=employee_id).first()
     bankdetails = Bankdetails.query.filter_by(employee_id=employee_id).all()
-    
+
     # If photo exists, construct static file path
     static_file_path = None
     if photo:
         static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{photo.stored_file_name}"
 
-    
+
   if not employee:
     flash('Employee not found.', category='error')
     return redirect(url_for('views.employee_list'))
@@ -420,7 +420,7 @@ def edit_employee(employee_id):
     gender_id = request.form.get('gender')
     email = request.form.get('email')
     mobile = request.form.get('mobile')
-    role_id = request.form.get('role_id')
+    role_id = request.form.get('role')
     birthdate = request.form.get('birthdate')
     height = request.form.get('height')
     weight = request.form.get('weight')
@@ -460,7 +460,7 @@ def edit_employee(employee_id):
     bank_branches = request.form.getlist('bank_branch[]')
     bank_account_numbers = request.form.getlist('bank_account_number[]')
     bank_ifsc_codes = request.form.getlist('bank_ifsc_code[]')
-   
+
 
     if not first_name or not last_name or not email or not mobile:
       flash('All fields are required.', category='error')
@@ -533,8 +533,8 @@ def edit_employee(employee_id):
           bank.bank_branch = request.form.get(f'bankdetails_bank_branch{bank.id}')
           bank.bank_account_number = request.form.get(f'bankdetails_bank_account_number{bank.id}')
           bank.bank_ifsc_code = request.form.get(f'bankdetails_bank_ifsc_code{bank.id}')
-          
-          
+
+
         #  Create new Bank Details
         for bank_name, bank_branch, bank_account_number, bank_ifsc_code in zip(bank_names, bank_branches, bank_account_numbers, bank_ifsc_codes):
             new_bank_detail = Bankdetails(employee_id=new_employee.employee_id,
@@ -732,12 +732,14 @@ def upload(employee_id):
                   ExpiresIn=31536000  # URL expires in 1 hour, adjust as needed
               )
 
-              # Construct the URL for serving static files
-              static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{file_path}"
-
-              # Redirect back to edit_employee page with presigned URL and static file path
-              return redirect(url_for('views.edit_employee', employee_id=employee_id,
-                                       presigned_url=presigned_url, static_file_path=static_file_path))
+                  # Construct the URL for serving static files
+              static_file_path = None
+              if photo:
+                  static_file_path = f"https://{bucket_name}.s3.amazonaws.com/{file_path}"
+    
+                  # Redirect back to edit_employee page with presigned URL and static file path
+                  return redirect(url_for('views.edit_employee', employee_id=employee_id,
+                    presigned_url=presigned_url, static_file_path=static_file_path))
 
               
           except ClientError as e:
@@ -748,10 +750,7 @@ def upload(employee_id):
               return redirect(url_for('some_redirect_route'))
 
     # If the file upload fails or if no file was uploaded, render the edit_employee template
-    return render_template('edit_employee.html',
-                         employee=employee,
-                           photo=photo,
-                         user=current_user)
+    return redirect(url_for('views.edit_employee', employee=employee, photo=photo, static_file_path=static_file_path))
 
 ######## ADD DOCUMENTS ########
 
@@ -981,13 +980,11 @@ def role():
   if request.method == 'POST':
     role_name = request.form.get('role_name')
     description = request.form.get('description')
-
     if not role_name:
       flash('Role name is required.', category='error')
     else:
       existing_role = Role.query.filter_by(role=role_name,
                                            user_id=current_user.id).first()
-
       if existing_role:
         flash('Role type already exists.', category='error')
       else:
@@ -997,30 +994,24 @@ def role():
         db.session.add(new_role)
         db.session.commit()
         flash('Role added successfully!', category='success')
-
   roles = Role.query.filter_by(user_id=current_user.id).all()
   return render_template("role.html", user=current_user, roles=roles)
 
 
 ######## EDIT ROLES ########
-
-
 @views.route('/edit_role/<int:role_id>', methods=['GET', 'POST'])
 @login_required
 @cross_origin()
 def edit_role(role_id):
   role = Role.query.get_or_404(role_id)
-
   if request.method == 'POST':
     role_name = request.form.get('role_name')
     description = request.form.get('description')
-
     if not role_name:
       flash('Role name is required.', category='error')
     else:
       existing_role = Role.query.filter_by(role=role_name,
                                            user_id=current_user.id).first()
-
       if existing_role and existing_role.id != role.id:
         flash('Role already exists. Please select another name.',
               category='error')
@@ -1030,7 +1021,6 @@ def edit_role(role_id):
         db.session.commit()
         flash('Role updated successfully!', category='success')
         return redirect(url_for('views.role'))
-
   return render_template("edit_role.html", user=current_user, role=role)
 
 

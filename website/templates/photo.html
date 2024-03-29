@@ -1,21 +1,20 @@
-      <div class="container">
-          <div class="col-md-4">
-              <div class="card">
-                  <div class="card-body">
-                      <div class="text-center">
-                          <div class="profile-userpic">
-                              <img id="uploadedImage" src="{{ url_for('static', filename='placeholder.jpg') }}" class="img-responsive" alt="" style="width: 100%;">
-                          </div>
-                          <form action="/upload" method="post" enctype="multipart/form-data">
-                              <div class="form-group mt-3">
-                                  <input type="file" class="form-control-file" id="exampleInputFile" name="file" accept="image/*"> 
-                              </div>
-                              <div class="input-group-append">
-                                  <button class="btn btn-primary" type="submit">Upload</button>
-                              </div>
-                          </form>
-                      </div>
-                  </div>
+<div class="col-md-4">
+  <div class="card">
+      <div class="card-body">
+          <div class="text-center">
+              <div class="profile-userpic">
+                  {% if static_file_path %}
+                      <img id="uploadedImage" src="{{ static_file_path }}" class="img-responsive" alt="" style="width: 100%;">
+                  {% endif %}
               </div>
+              <form action="{{ url_for('views.upload', employee_id=employee.employee_id) }}" method="post" enctype="multipart/form-data">
+                  <div class="form-group mt-3">
+                      <input type="file" class="form-control-file" id="exampleInputFile" name="file" accept="image/*"> 
+                  </div>
+                  <div class="input-group-append">
+                      <button class="btn btn-primary" type="submit">Upload</button>
+                  </div>
+              </form>
+
           </div>
       </div>
