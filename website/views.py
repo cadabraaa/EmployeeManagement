@@ -11,7 +11,6 @@ import time
 from botocore.exceptions import ClientError
 import botocore
 import boto3
-import pdfkit
 
 
 views = Blueprint('views', __name__)
